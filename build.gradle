@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'application'
     id 'org.springframework.boot' version '3.0.6'
     id 'io.spring.dependency-management' version '1.1.0'
     id 'org.graalvm.buildtools.native' version '0.9.20'
@@ -65,11 +66,8 @@ jacocoTestReport {
     }
 }
 
-springBoot {
-    mainClassName = 'hexlet.code.AppApplication'
-}
-
 bootJar {
     archiveBaseName = 'TaskManager'
     archiveVersion =  '1.0-SNAPSHOT'
+    mainClassName = 'hexlet.code.AppApplication'
 }
