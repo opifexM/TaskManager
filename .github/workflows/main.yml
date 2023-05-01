@@ -18,7 +18,7 @@ jobs:
       - name: Gradle Build Action
         uses: gradle/gradle-build-action@v2.4.2
         with:
-          build-root-directory: app
+          arguments: build
       - name: Publish code coverage
         uses: paambaati/codeclimate-action@v3.0.0
         env:
