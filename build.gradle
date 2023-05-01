@@ -71,12 +71,11 @@ jacocoTestReport {
     }
 }
 
-jar {
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    manifest {
-        attributes(
-                'Main-Class': 'hexlet.code.AppApplication'
-        )
-    }
-    from { (configurations.runtimeClasspath).collect { it.isDirectory() ? it : zipTree(it) } }
+springBoot {
+    mainClassName = 'hexlet.code.AppApplication'
+}
+
+bootJar {
+    archiveBaseName = 'TaskManager'
+    archiveVersion =  '1.0-SNAPSHOT'
 }
