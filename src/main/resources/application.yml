@@ -1,0 +1,36 @@
+server:
+  port: ${PORT:8080}
+
+logging:
+  level:
+    root: INFO
+
+spring:
+  liquibase:
+    enabled: true
+    change-log: classpath:/db/changelog/db.changelog-master.xml
+
+  datasource:
+    url: ${DATABASE_URL_SPRING}
+    username: ${DATABASE_USER}
+    password: ${DATABASE_PASSWORD}
+
+    #    url: jdbc:postgresql://localhost:5432/task-manager
+#    username: postgres
+#    password: postgres
+#    #  datasource:
+    #    url: jdbc:h2:file:./db # в корне проект файл бд db.mv.db
+    #    username:
+    #    password:
+    #    username: ${PGUSER}
+    #    password: ${PGPASSWORD}
+    #    url: jdbc:postgresql://${PGHOST}:${PGPORT}/${PGDATABASE}
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: validate
+
+springdoc:
+  swagger-ui:
+    path: /swagger.html
