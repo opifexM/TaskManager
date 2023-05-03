@@ -19,6 +19,7 @@ public class WelcomeController {
     @Operation(summary = "Get welcome message", description = "Returns a welcome message to the user.")
     public String index(Model model) {
         log.info("Index page");
+        log.info("Index page");
         model.addAttribute("welcomeMessage", "Welcome to Spring");
         return ViewConstants.FORWARD_WELCOME;
     }
