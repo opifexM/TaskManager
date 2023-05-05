@@ -27,13 +27,11 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -44,8 +42,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UserControllerTest {
-
+    public static final String API_USERS = "/api/users";
     public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
     @LocalServerPort
     private int port;
 
@@ -67,15 +66,8 @@ class UserControllerTest {
     }
 
     @BeforeAll
-    void setUp() throws IOException {
-        String jsonFilePath = "src/test/resources/users.json";
-        try (InputStream is = new FileInputStream(jsonFilePath)) {
-            createUsers(new String(is.readAllBytes(), StandardCharsets.UTF_8));
-        }
-    }
-
-    private void createUsers(String jsonContent) throws JsonProcessingException {
-        List<User> users = OBJECT_MAPPER.readValue(jsonContent, new TypeReference<>() {
+    void createUsers() throws IOException {
+        List<User> users = OBJECT_MAPPER.readValue(jsonRead("fixtures/users.json"), new TypeReference<>() {
         });
         for (User user : users) {
             HttpHeaders headers = new HttpHeaders();
@@ -83,7 +75,16 @@ class UserControllerTest {
 
             String userJson = OBJECT_MAPPER.writeValueAsString(user);
             HttpEntity<String> request = new HttpEntity<>(userJson, headers);
-            restTemplate.postForEntity("http://localhost:" + port + "/api/users", request, Void.class);
+            restTemplate.postForEntity("http://localhost:" + port + API_USERS, request, Void.class);
+        }
+    }
+
+    private String jsonRead(String jsonFilePath) throws IOException {
+        try (InputStream is = getClass().getClassLoader().getResourceAsStream(jsonFilePath)) {
+            if (is == null) {
+                throw new FileNotFoundException("Resource not found: " + jsonFilePath);
+            }
+            return new String(is.readAllBytes(), StandardCharsets.UTF_8);
         }
     }
 
@@ -93,7 +94,7 @@ class UserControllerTest {
         };
 
         ResponseEntity<List<UserDto>> response = restTemplate.exchange(
-                "http://localhost:" + port + "/api/users",
+                "http://localhost:" + port + API_USERS,
                 HttpMethod.GET,
                 null,
                 responseType);
@@ -120,7 +121,7 @@ class UserControllerTest {
     @Test
     void getUserById() {
         long userId = 1L;
-        ResponseEntity<UserDto> response = restTemplate.getForEntity("http://localhost:" + port + "/api/users/" + userId, UserDto.class);
+        ResponseEntity<UserDto> response = restTemplate.getForEntity("http://localhost:" + port + API_USERS + "/" + userId, UserDto.class);
 
         UserDto user = response.getBody();
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -133,18 +134,13 @@ class UserControllerTest {
     }
 
     @Test
-    void createUser() throws JsonProcessingException {
-        User newUser = new User();
-        newUser.setFirstName("John");
-        newUser.setLastName("Doe");
-        newUser.setEmail("john.doe@example.com");
-        newUser.setPassword("123456");
+    void createUser() throws IOException {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        String userJson = OBJECT_MAPPER.writeValueAsString(newUser);
+        String userJson = jsonRead("fixtures/newUser.json");
         HttpEntity<String> request = new HttpEntity<>(userJson, headers);
-        ResponseEntity<UserDto> response = restTemplate.postForEntity("http://localhost:" + port + "/api/users", request, UserDto.class);
+        ResponseEntity<UserDto> response = restTemplate.postForEntity("http://localhost:" + port + API_USERS, request, UserDto.class);
 
         UserDto createdUser = response.getBody();
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -156,33 +152,92 @@ class UserControllerTest {
         assertEquals("john.doe@example.com", createdUser.getEmail());
     }
 
-
     @Test
-    void deleteUser() throws JsonProcessingException {
-        User newUser = new User();
-        newUser.setFirstName("Mark");
-        newUser.setLastName("Ten");
-        newUser.setEmail("Mark.Ten@example.com");
-        newUser.setPassword("123456");
+    void updateUser() throws IOException {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        String userJson = OBJECT_MAPPER.writeValueAsString(newUser);
+        String userJson = jsonRead("fixtures/newUserForUpdate.json");
         HttpEntity<String> request = new HttpEntity<>(userJson, headers);
-        ResponseEntity<UserDto> response = restTemplate.postForEntity("http://localhost:" + port + "/api/users", request, UserDto.class);
+        ResponseEntity<UserDto> response = restTemplate.postForEntity("http://localhost:" + port + API_USERS, request, UserDto.class);
 
         UserDto createdUser = response.getBody();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(createdUser);
         assertNotNull(createdUser.getId());
 
-        restTemplate.delete("http://localhost:" + port + "/api/users/" + createdUser.getId());
+        assertEquals("Mike", createdUser.getFirstName());
+        assertEquals("Whisky", createdUser.getLastName());
+        assertEquals("mike.whisky@example.com", createdUser.getEmail());
+
+        userJson = jsonRead("fixtures/updateUser.json");
+        request = new HttpEntity<>(userJson, headers);
+        response = restTemplate.exchange("http://localhost:" + port + API_USERS + createdUser.getId(), HttpMethod.PUT, request, UserDto.class);
+
+    }
+
+
+    @Test
+    void deleteUser() throws IOException {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        String userJson = jsonRead("fixtures/newUserForDelete.json");
+        HttpEntity<String> request = new HttpEntity<>(userJson, headers);
+        ResponseEntity<UserDto> response = restTemplate.postForEntity("http://localhost:" + port + API_USERS, request, UserDto.class);
+
+        UserDto createdUser = response.getBody();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(createdUser);
+        assertNotNull(createdUser.getId());
+
+        restTemplate.delete("http://localhost:" + port + API_USERS + "/" + createdUser.getId());
         ResponseEntity<List<UserDto>> allUsersResponse = restTemplate.exchange(
-                "http://localhost:" + port + "/api/users",
+                "http://localhost:" + port + API_USERS,
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<>() {});
+                new ParameterizedTypeReference<>() {
+                });
         List<UserDto> allUsers = allUsersResponse.getBody();
         assertNotNull(allUsers);
         assertFalse(allUsers.stream().anyMatch(user -> user.getEmail().equals(createdUser.getEmail())));
     }
+
+    @Test
+    void createUserWithInvalidEmail() throws IOException {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        String userJson = jsonRead("fixtures/invalidNewUser1.json");
+        HttpEntity<String> request = new HttpEntity<>(userJson, headers);
+        ResponseEntity<String> response = restTemplate.postForEntity("http://localhost:" + port + API_USERS, request, String.class);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
+
+    @Test
+    void createUserWithInvalidName() throws IOException {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        String userJson = jsonRead("fixtures/invalidNewUser2.json");
+        HttpEntity<String> request = new HttpEntity<>(userJson, headers);
+        ResponseEntity<String> response = restTemplate.postForEntity("http://localhost:" + port + API_USERS, request, String.class);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
+
+    @Test
+    void createUserWithInvalidPassword() throws IOException {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        String userJson = jsonRead("fixtures/invalidNewUser3.json");
+        HttpEntity<String> request = new HttpEntity<>(userJson, headers);
+        ResponseEntity<String> response = restTemplate.postForEntity("http://localhost:" + port + API_USERS, request, String.class);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
+
+
 }
