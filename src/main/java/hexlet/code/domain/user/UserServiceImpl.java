@@ -21,11 +21,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> findAll() {
+        log.info("Retrieving all users");
         return userRepository.findAll();
     }
 
     @Override
     public User findById(Long id) {
+        log.info("Retrieving user with ID: {}", id);
         return userRepository.findById(id)
                 .orElseThrow(() -> UserNotFoundException.forId(id));
     }
@@ -35,11 +37,13 @@ public class UserServiceImpl implements UserService {
         newUser.setCreatedAt(LocalDateTime.now());
         // newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
         newUser.setPassword(newUser.getPassword());
+        log.info("Saving new user: {}", newUser);
         return userRepository.save(newUser);
     }
 
     @Override
     public User updateById(User updatedUser, long id) {
+        log.info("Updating user with ID: {} with data: {}", id, updatedUser);
         return userRepository.findById(id)
                 .map(user -> {
                     user.setFirstName(updatedUser.getFirstName());
@@ -54,6 +58,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteById(long id) {
+        log.info("Deleting user with ID: {}", id);
         if (!userRepository.existsById(id)) {
             throw UserNotFoundException.forId(id);
         }
