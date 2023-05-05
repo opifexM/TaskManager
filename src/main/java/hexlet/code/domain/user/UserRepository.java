@@ -1,4 +1,4 @@
-package hexlet.code.user;
+package hexlet.code.domain.user;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

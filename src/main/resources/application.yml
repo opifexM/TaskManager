@@ -23,10 +23,14 @@ spring:
   config:
     activate:
       on-profile: dev
+#  datasource:
+#    username:
+#    password:
+#    url: jdbc:h2:./database
   datasource:
-    username: ""
-    password: ""
-    url: "jdbc:h2:./database"
+    url: jdbc:postgresql://localhost:5432/task-manager
+    username: postgres
+    password: postgres
 
 ---
 spring:
@@ -37,13 +41,3 @@ spring:
     url: ${DATABASE_URL_SPRING}
     username: ${DATABASE_USER}
     password: ${DATABASE_PASSWORD}
-
----
-spring:
-  config:
-    activate:
-      on-profile: test
-  datasource:
-    url: jdbc:postgresql://localhost:5432/test_db
-    username: test_user
-    password: test_password

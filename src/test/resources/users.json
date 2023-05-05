@@ -1,0 +1,62 @@
+[
+  {
+    "email": "ivan@google.com",
+    "firstName": "Ivan",
+    "lastName": "Petrov",
+    "password": "password123"
+  },
+  {
+    "email": "petr@yahoo.com",
+    "firstName": "Petr",
+    "lastName": "Sidorov",
+    "password": "password456"
+  },
+  {
+    "email": "maria@gmail.com",
+    "firstName": "Maria",
+    "lastName": "Ivanova",
+    "password": "password789"
+  },
+  {
+    "email": "anna@outlook.com",
+    "firstName": "Anna",
+    "lastName": "Petrova",
+    "password": "password321"
+  },
+  {
+    "email": "sergey@mail.ru",
+    "firstName": "Sergey",
+    "lastName": "Ivanov",
+    "password": "password654"
+  },
+  {
+    "email": "mikhail@protonmail.com",
+    "firstName": "Mikhail",
+    "lastName": "Sidorov",
+    "password": "password987"
+  },
+  {
+    "email": "elena@hotmail.com",
+    "firstName": "Elena",
+    "lastName": "Fedorova",
+    "password": "password135"
+  },
+  {
+    "email": "olga@yandex.ru",
+    "firstName": "Olga",
+    "lastName": "Volkova",
+    "password": "password246"
+  },
+  {
+    "email": "boris@gmail.com",
+    "firstName": "Boris",
+    "lastName": "Alexandrov",
+    "password": "password369"
+  },
+  {
+    "email": "natalia@yahoo.com",
+    "firstName": "Natalia",
+    "lastName": "Mikhailova",
+    "password": "password478"
+  }
+]
