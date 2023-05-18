@@ -6,15 +6,19 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
+
+import static jakarta.persistence.TemporalType.TIMESTAMP;
 
 @Getter
 @Setter
@@ -36,7 +40,7 @@ public class User {
     @Size(max = 50, message = "Last name cannot exceed 50 characters")
     private String lastName;
 
-    @Column(name = "email")
+    @Column(name = "email", unique = true)
     @NotBlank(message = "Email cannot be blank")
     @Email(message = "Invalid email format")
     @Size(max = 100, message = "Email cannot exceed 100 characters")
@@ -48,13 +52,15 @@ public class User {
     private String password;
 
     @Column(name = "created_at")
+    @CreationTimestamp
+    @Temporal(TIMESTAMP)
     private LocalDateTime createdAt;
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        User user = (User) o;
+        final User user = (User) o;
         return getId() != null && Objects.equals(getId(), user.getId());
     }
 

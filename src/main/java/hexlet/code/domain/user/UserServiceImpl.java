@@ -3,20 +3,26 @@ package hexlet.code.domain.user;
 import hexlet.code.domain.exception.UserNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 @Slf4j
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserRepository userRepository;
-    // private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(final UserRepository userRepository,
+                           final BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -26,42 +32,53 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User findById(Long id) {
+    public User findById(final Long id) {
         log.info("Retrieving user with ID: {}", id);
         return userRepository.findById(id)
                 .orElseThrow(() -> UserNotFoundException.forId(id));
     }
 
     @Override
-    public User save(User newUser) {
-        newUser.setCreatedAt(LocalDateTime.now());
-        // newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
-        newUser.setPassword(newUser.getPassword());
+    public User save(final User newUser) {
+        newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
         log.info("Saving new user: {}", newUser);
         return userRepository.save(newUser);
     }
 
     @Override
-    public User updateById(User updatedUser, long id) {
+    public User updateById(final User updatedUser, final long id) {
         log.info("Updating user with ID: {} with data: {}", id, updatedUser);
         return userRepository.findById(id)
                 .map(user -> {
                     user.setFirstName(updatedUser.getFirstName());
                     user.setLastName(updatedUser.getLastName());
                     user.setEmail(updatedUser.getEmail());
-                    // user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
-                    user.setPassword(updatedUser.getPassword());
+                    user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
                     return userRepository.save(user);
                 })
                 .orElseThrow(() -> UserNotFoundException.forId(id));
     }
 
     @Override
-    public void deleteById(long id) {
+    public void deleteById(final long id) {
         log.info("Deleting user with ID: {}", id);
         if (!userRepository.existsById(id)) {
             throw UserNotFoundException.forId(id);
         }
         userRepository.deleteById(id);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(final String email) throws UsernameNotFoundException {
+        return userRepository.findByEmail(email)
+                .map(this::toSpringUser)
+                .orElseThrow(() -> UserNotFoundException.forEmail(email));
+    }
+
+    private org.springframework.security.core.userdetails.User toSpringUser(final User user) {
+        return new org.springframework.security.core.userdetails.User(
+                user.getEmail(),
+                user.getPassword(),
+                List.of(new SimpleGrantedAuthority("USER")));
     }
 }

@@ -1,12 +1,11 @@
 package hexlet.code.domain.user;
 
-import java.time.LocalDateTime;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2023-05-04T10:44:58-0400",
+    date = "2023-05-17T19:48:38-0400",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.7 (Amazon.com Inc.)"
 )
 @Component
@@ -35,19 +34,13 @@ public class UserMapperImpl implements UserMapper {
             return null;
         }
 
-        Long id = null;
-        String firstName = null;
-        String lastName = null;
-        String email = null;
-        LocalDateTime createdAt = null;
+        UserDto userDto = new UserDto();
 
-        id = user.getId();
-        firstName = user.getFirstName();
-        lastName = user.getLastName();
-        email = user.getEmail();
-        createdAt = user.getCreatedAt();
-
-        UserDto userDto = new UserDto( id, firstName, lastName, email, createdAt );
+        userDto.setId( user.getId() );
+        userDto.setFirstName( user.getFirstName() );
+        userDto.setLastName( user.getLastName() );
+        userDto.setEmail( user.getEmail() );
+        userDto.setCreatedAt( user.getCreatedAt() );
 
         return userDto;
     }

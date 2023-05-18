@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("${base-url}" + "/users")
 @Tag(name = "User Management", description = "User management API")
 @Slf4j
 public class UserController {
@@ -33,8 +33,8 @@ public class UserController {
     private final UserService userService;
 
     @Autowired
-    public UserController(UserService userService,
-                          UserMapper userMapper) {
+    public UserController(final UserService userService,
+                          final UserMapper userMapper) {
         this.userService = userService;
         this.userMapper = userMapper;
     }
@@ -48,22 +48,22 @@ public class UserController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Get user by ID", description = "Retrieves a user by ID")
-    public UserDto getUserById(@PathVariable("id") @Parameter(description = "User ID") long id) {
+    public UserDto getUserById(@PathVariable("id") @Parameter(description = "User ID") final long id) {
         log.info("Getting user with ID: {}", id);
         return userMapper.toDto(userService.findById(id));
     }
 
     @PostMapping("")
     @Operation(summary = "Create a new user", description = "Creates a new user")
-    public UserDto createUser(@Valid @RequestBody @Parameter(description = "User object") User newUser) {
+    public UserDto createUser(@Valid @RequestBody @Parameter(description = "User object") final User newUser) {
         log.info("Creating a new user: {}", newUser);
         return userMapper.toDto(userService.save(newUser));
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Update user by ID", description = "Updates user information by ID")
-    public UserDto updateUser(@Valid @RequestBody @Parameter(description = "Updated user object") User updatedUser,
-                              @PathVariable("id") @Parameter(description = "User ID") long id) {
+    public UserDto updateUser(@Valid @RequestBody @Parameter(description = "Updated user object") final User updatedUser,
+                              @PathVariable("id") @Parameter(description = "User ID") final long id) {
         log.info("Updating user with ID: {} with data: {}", id, updatedUser);
         return userMapper.toDto(userService.updateById(updatedUser, id));
     }
@@ -71,7 +71,7 @@ public class UserController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete user by ID", description = "Deletes a user by ID")
-    public void deleteUser(@PathVariable("id") @Parameter(description = "User ID") long id) {
+    public void deleteUser(@PathVariable("id") @Parameter(description = "User ID") final long id) {
         log.info("Deleting user with ID: {}", id);
         userService.deleteById(id);
     }

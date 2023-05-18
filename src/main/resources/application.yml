@@ -1,6 +1,12 @@
 server:
   port: ${PORT:8080}
 
+base-url: /api
+jwt:
+  # min 32 symbols
+  secret: SecretKeySecretKeySecretKeySecretKeySecretKeySecretKeySecretKeySecretKeySecretKeySecretKeySecretKey
+  expiration: 3600000
+
 logging:
   level:
     root: INFO
