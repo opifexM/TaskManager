@@ -38,3 +38,7 @@ out/
 /db.mv.db
 /database.mv.db
 /database.trace.db
+/frontend/build/
+/frontend/node_modules/
+/node/
+/src/main/generated/

@@ -1,0 +1,16 @@
+POST http://localhost:8080/login
+Content-Type: application/x-www-form-urlencoded
+
+username=test@test.com&password=123456
+
+###
+POST http://127.0.0.1:8080/api/users
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwiaWF0IjoxNjg0NDI1NzIxLCJleHAiOjE2ODQ0MjkzMjF9.PBk5RNLlUxHFrYOVHbFxGusvH0WZF6BAYVro5B2kDSXHsQo1wN8A2TcdWiYP8v5hv2w9GQxoTonAb__nOpka1w
+
+{
+  "email": "test@test.com",
+  "firstName": "testName",
+  "lastName": "testLastName",
+  "password": "123456"
+}

@@ -11,8 +11,11 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -32,16 +35,34 @@ public class WebSecurityConfig {
                                            final JwtAuthorizationFilter jwtAuthorizationFilter) throws Exception {
         log.info("config http security");
         http
-                .csrf().disable()
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
-                        matcherRegistry -> matcherRegistry
-                                .requestMatchers(HttpMethod.GET, baseUrl + "/users/**").permitAll()
-                                // .requestMatchers(baseUrl + "/users/**").permitAll()
+                        authorize -> authorize
+                                .requestMatchers(
+                                        new AntPathRequestMatcher(baseUrl + "/users/**", HttpMethod.POST.toString()),
+                                        new AntPathRequestMatcher(baseUrl + "/users/**", HttpMethod.GET.toString()),
+                                        new NegatedRequestMatcher(new AntPathRequestMatcher(baseUrl + "/**"))
+                                ).permitAll()
                                 .anyRequest().authenticated()
                 )
+                // .authorizeHttpRequests(
+                //         matcherRegistry -> matcherRegistry
+                //                 .requestMatchers(HttpMethod.GET, baseUrl + "/users/**").permitAll()
+                //                 .requestMatchers(HttpMethod.POST, baseUrl + "/users/**").permitAll()
+                //                 // new NegatedRequestMatcher(new AntPathRequestMatcher(baseUrl + "/**"))
+                //                 // .requestMatchers(baseUrl + "/users/**").permitAll()
+                //                 // .requestMatchers("/**").permitAll()
+                //                 .anyRequest().authenticated()
+                // )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthorizationFilter, JWTAuthenticationFilter.class)
-                .formLogin()
+                // .formLogin(formLogin -> formLogin
+                //                 // .usernameParameter("username")
+                //                 // .passwordParameter("password")
+                //                 // .loginPage("/authentication/login")
+                //                 // .failureUrl("/authentication/login?failed")
+                //                 // .loginProcessingUrl("/authentication/login/process")
+                // );
         ;
         return http.build();
     }

@@ -1,10 +1,11 @@
 plugins {
     id 'java'
     id 'application'
-    id 'org.springframework.boot' version '3.0.6'
+    id 'org.springframework.boot' version '3.1.0'
     id 'io.spring.dependency-management' version '1.1.0'
     id 'io.freefair.lombok' version '8.0.1'
     id 'jacoco'
+    id 'org.siouan.frontend-jdk11' version '6.0.0'
 }
 
 group = 'hexlet.code'
@@ -15,6 +16,10 @@ configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs.add('-parameters')
 }
 
 repositories {
@@ -67,6 +72,7 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
+
 jacocoTestReport {
     reports {
         xml.required = true
@@ -78,3 +84,34 @@ bootJar {
     archiveVersion =  '1.0-SNAPSHOT'
     mainClassName = 'hexlet.code.AppApplication'
 }
+
+
+// frontend start
+frontend {
+    nodeVersion = '16.13.1'
+    installScript = 'install'
+    assembleScript = 'run build'
+    packageJsonDirectory = file("${projectDir}/frontend")
+}
+
+def configFrontendTasks = {
+    inputs.files(fileTree("$projectDir/frontend").exclude('build', 'node_modules'))
+    outputs.dir("$buildDir/resources/main/static")
+}
+
+assembleFrontend {
+    configure configFrontendTasks
+    doLast {
+        copy {
+            from "$projectDir/frontend/build"
+            into "$buildDir/resources/main/static"
+        }
+    }
+}
+
+installFrontend {
+    configure configFrontendTasks
+}
+
+processResources.dependsOn assembleFrontend
+// frontend end

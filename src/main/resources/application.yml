@@ -16,9 +16,12 @@ spring:
     enabled: true
     change-log: classpath:/db/changelog/db.changelog-master.xml
   jpa:
+    open-in-view: false
     show-sql: true
     hibernate:
       ddl-auto: validate
+  profiles:
+    default: dev
 
 springdoc:
   swagger-ui:
