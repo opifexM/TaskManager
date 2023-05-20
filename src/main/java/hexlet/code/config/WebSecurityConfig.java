@@ -61,7 +61,7 @@ public class WebSecurityConfig {
                 //                 // .passwordParameter("password")
                 //                 // .loginPage("/authentication/login")
                 //                 // .failureUrl("/authentication/login?failed")
-                //                 // .loginProcessingUrl("/authentication/login/process")
+                //                 .loginProcessingUrl(baseUrl + "/api/login")
                 // );
         ;
         return http.build();
