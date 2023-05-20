@@ -43,26 +43,19 @@ public class WebSecurityConfig {
                                         new AntPathRequestMatcher(baseUrl + "/users/**", HttpMethod.GET.toString()),
                                         new NegatedRequestMatcher(new AntPathRequestMatcher(baseUrl + "/**"))
                                 ).permitAll()
+                                // .requestMatchers("/**").permitAll()
                                 .anyRequest().authenticated()
                 )
-                // .authorizeHttpRequests(
-                //         matcherRegistry -> matcherRegistry
-                //                 .requestMatchers(HttpMethod.GET, baseUrl + "/users/**").permitAll()
-                //                 .requestMatchers(HttpMethod.POST, baseUrl + "/users/**").permitAll()
-                //                 // new NegatedRequestMatcher(new AntPathRequestMatcher(baseUrl + "/**"))
-                //                 // .requestMatchers(baseUrl + "/users/**").permitAll()
-                //                 // .requestMatchers("/**").permitAll()
-                //                 .anyRequest().authenticated()
-                // )
+
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthorizationFilter, JWTAuthenticationFilter.class)
-                // .formLogin(formLogin -> formLogin
-                //                 // .usernameParameter("username")
-                //                 // .passwordParameter("password")
-                //                 // .loginPage("/authentication/login")
-                //                 // .failureUrl("/authentication/login?failed")
-                //                 // .loginProcessingUrl("/authentication/login/process")
-                // );
+        //         .formLogin(formLogin -> formLogin
+        //                 // .usernameParameter("username")
+        //                 // .passwordParameter("password")
+        //                 // .loginPage("/authentication/login")
+        //                 // .failureUrl("/authentication/login?failed")
+        //                 // .loginProcessingUrl(baseUrl + "/api/login")
+        //         )
         ;
         return http.build();
     }
