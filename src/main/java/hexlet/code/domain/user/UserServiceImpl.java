@@ -70,9 +70,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(final String email) throws UsernameNotFoundException {
+        log.info("Attempting to load user by email: {}", email);
         return userRepository.findByEmail(email)
                 .map(this::toSpringUser)
-                .orElseThrow(() -> UserNotFoundException.forEmail(email));
+                .orElseThrow(() -> {
+                    log.error("User not found for email: {}", email);
+                    return new UsernameNotFoundException(email);
+                });
     }
 
     private org.springframework.security.core.userdetails.User toSpringUser(final User user) {
