@@ -6,6 +6,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -21,6 +22,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 @Component
+@Slf4j
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
     @Value("${jwt.secret}")
@@ -34,6 +36,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
         String header = request.getHeader("Authorization");
         if (header == null || !header.startsWith("Bearer ")) {
+            log.warn("No Authorization header or does not start with Bearer");
             chain.doFilter(request, response);
             return;
         }
@@ -58,9 +61,11 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                         .getSubject();
 
                 if (user != null) {
+                    log.info("User {} authenticated successfully", user);
                     return new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
                 }
             } catch (Exception e) {
+                log.error("Can't extract login data from request", e);
                 throw new BadCredentialsException("Can't extract login data from request");
             }
         }

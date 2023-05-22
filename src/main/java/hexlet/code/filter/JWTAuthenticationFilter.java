@@ -43,8 +43,11 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                             final Authentication authResult) {
         try {
             final String jwt = jwtUtils.generateJwtToken(authResult);
-            response.addHeader("Authorization", "Bearer " + jwt);
-        } catch (JwtException e) {
+            response.setContentType("text/plain");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().println(jwt);
+            log.info("JWT successfully generated for user {}", authResult.getName());
+        } catch (JwtException | IOException e) {
             log.error("Failed to generate JWT", e);
             throw new AuthenticationServiceException("Failed to generate JWT", e);
         }
@@ -58,9 +61,10 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                     credentials.getEmail(), credentials.getPassword(), Collections.emptyList());
             Authentication authentication = getAuthenticationManager().authenticate(authToken);
-            log.info("Authentication result: {}", authentication);
+            log.info("Authentication attempt for user {}", credentials.getEmail());
             return authentication;
         } catch (IOException e) {
+            log.error("Failed to parse authentication request body", e);
             throw new AuthenticationServiceException("Failed to parse authentication request body", e);
         }
     }

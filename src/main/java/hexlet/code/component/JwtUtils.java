@@ -3,6 +3,7 @@ package hexlet.code.component;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -13,6 +14,7 @@ import java.time.Instant;
 import java.util.Date;
 
 @Component
+@Slf4j
 public class JwtUtils {
 
     @Value("${jwt.secret}")
@@ -29,11 +31,14 @@ public class JwtUtils {
         byte[] apiKeySecretBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
         SecretKey secretKey = Keys.hmacShaKeyFor(apiKeySecretBytes);
 
-        return Jwts.builder()
+        String jwt = Jwts.builder()
                 .setSubject(userPrincipal.getUsername())
                 .setIssuedAt(Date.from(Instant.now()))
                 .setExpiration(Date.from(Instant.now().plusMillis(jwtExpiration)))
                 .signWith(secretKey, SignatureAlgorithm.HS512)
                 .compact();
+
+        log.info("Generated JWT for user {}", userPrincipal.getUsername());
+        return jwt;
     }
 }
