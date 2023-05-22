@@ -3,6 +3,7 @@ package hexlet.code.config;
 import hexlet.code.domain.exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -31,4 +32,11 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
+    // Новый метод для обработки исключений Spring Security
+    // обрабатываем исключения типа AccessDeniedException когда отказано в доступе к ресурсу или методу
+    // В ответ на исключение возвращаем статус HTTP 403 (Forbidden) и сообщение "Access Denied".
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<String> handleAccessDeniedException(final AccessDeniedException e) {
+        return new ResponseEntity<>("Access Denied", HttpStatus.FORBIDDEN);
+    }
 }

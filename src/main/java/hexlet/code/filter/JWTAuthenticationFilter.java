@@ -1,7 +1,7 @@
 package hexlet.code.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import hexlet.code.component.JwtUtils;
+import hexlet.code.component.JwtGenerator;
 import hexlet.code.domain.user.User;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -25,13 +25,13 @@ import java.util.Collections;
 @Slf4j
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
-    private final JwtUtils jwtUtils;
+    private final JwtGenerator jwtGenerator;
 
     @Autowired
     public JWTAuthenticationFilter(final AuthenticationManager authenticationManager,
-                                   final JwtUtils jwtUtils,
-                                   final RequestMatcher loginRequest) {
-        this.jwtUtils = jwtUtils;
+                                   final RequestMatcher loginRequest,
+                                   final JwtGenerator jwtGenerator) {
+        this.jwtGenerator = jwtGenerator;
         this.setAuthenticationManager(authenticationManager);
         super.setRequiresAuthenticationRequestMatcher(loginRequest);
     }
@@ -42,7 +42,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                             final FilterChain chain,
                                             final Authentication authResult) {
         try {
-            final String jwt = jwtUtils.generateJwtToken(authResult);
+            final String jwt = jwtGenerator.generateJwtToken(authResult);
             response.setContentType("text/plain");
             response.setCharacterEncoding("UTF-8");
             response.getWriter().println(jwt);
