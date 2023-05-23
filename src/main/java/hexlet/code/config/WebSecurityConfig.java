@@ -3,7 +3,6 @@ package hexlet.code.config;
 import hexlet.code.filter.JWTAuthenticationFilter;
 import hexlet.code.filter.JwtAuthorizationFilter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,13 +22,12 @@ import org.springframework.security.web.util.matcher.RequestMatchers;
 @Configuration
 @EnableWebSecurity
 // Determines if Spring Security's PreAuthorize, PostAuthorize, PreFilter, and PostFilter annotations should be enabled. Default is true.
-@EnableMethodSecurity
+@EnableMethodSecurity()
 @Slf4j
 public class WebSecurityConfig {
 
     private final String baseUrl;
 
-    @Autowired
     public WebSecurityConfig(@Value("${base-url}") String baseUrl) {
         this.baseUrl = baseUrl;
     }

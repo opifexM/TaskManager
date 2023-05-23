@@ -13,6 +13,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Component
 @Slf4j
@@ -34,9 +35,13 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             return;
         }
 
-        Authentication authentication = jwtParser.parseJwtToken(request.getHeader("Authorization"));
-        log.info("Authentication successful for user: {}", authentication.getName());
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        Optional<Authentication> authentication = jwtParser.parseJwtToken(request.getHeader("Authorization"));
+        if (authentication.isPresent()) {
+            log.info("Authentication successful for user: {}", authentication.get().getName());
+            SecurityContextHolder.getContext().setAuthentication(authentication.get());
+        } else {
+            log.warn("Failed to authenticate user");
+        }
         chain.doFilter(request, response);
         log.info("Filtering completed for request: {}", request.getRequestURI());
     }

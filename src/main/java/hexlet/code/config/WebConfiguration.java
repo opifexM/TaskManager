@@ -13,11 +13,11 @@ import org.springframework.web.servlet.resource.PathResourceResolver;
 @Slf4j
 public class WebConfiguration implements WebMvcConfigurer {
 
-    private final String baseApiPath;
+    private final String baseUrl;
 
-    public WebConfiguration(@Value("${base-url}") String baseApiPath) {
-        log.info("Initializing WebConfiguration with baseApiPath: {}", baseApiPath);
-        this.baseApiPath = baseApiPath;
+    public WebConfiguration(@Value("${base-url}") String baseUrl) {
+        log.info("Initializing WebConfiguration with baseApiPath: {}", baseUrl);
+        this.baseUrl = baseUrl;
     }
 
     @Override
@@ -39,7 +39,7 @@ public class WebConfiguration implements WebMvcConfigurer {
                 .addResolver(new PathResourceResolver() {
                     @Override
                     protected Resource getResource(@NotNull String resourcePath, @NotNull Resource location) {
-                        if (resourcePath.startsWith(baseApiPath) || resourcePath.startsWith(baseApiPath.substring(1))) {
+                        if (resourcePath.startsWith(baseUrl) || resourcePath.startsWith(baseUrl.substring(1))) {
                             return null;
                         }
                         return location.exists() && location.isReadable() ? location : null;

@@ -2,7 +2,6 @@ package hexlet.code.domain.user;
 
 import hexlet.code.domain.exception.UserNotFoundException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -18,7 +17,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @Autowired
     public UserServiceImpl(final UserRepository userRepository,
                            final PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
@@ -42,13 +40,15 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public User save(final User newUser) {
         newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
         log.info("Saving new user: {}", newUser);
-        return userRepository.save(newUser);
+        User savedUser = userRepository.save(newUser);
+        savedUser.setPassword(null);
+        return savedUser;
     }
 
     @Override
     public User updateById(final User updatedUser, final long id) {
         log.info("Updating user with ID: {} with data: {}", id, updatedUser);
-        return userRepository.findById(id)
+        User savedUser = userRepository.findById(id)
                 .map(user -> {
                     user.setFirstName(updatedUser.getFirstName());
                     user.setLastName(updatedUser.getLastName());
@@ -57,6 +57,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                     return userRepository.save(user);
                 })
                 .orElseThrow(() -> UserNotFoundException.forId(id));
+        savedUser.setPassword(null);
+        return savedUser;
     }
 
     @Override

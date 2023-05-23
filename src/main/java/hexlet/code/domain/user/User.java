@@ -1,12 +1,12 @@
 package hexlet.code.domain.user;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -14,11 +14,10 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
-
-import static jakarta.persistence.TemporalType.TIMESTAMP;
 
 @Getter
 @Setter
@@ -53,7 +52,7 @@ public class User {
 
     @Column(name = "created_at")
     @CreationTimestamp
-    @Temporal(TIMESTAMP)
+    @Convert(converter = Jsr310JpaConverters.LocalDateTimeConverter.class)
     private LocalDateTime createdAt;
 
     @Override

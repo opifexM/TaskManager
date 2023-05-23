@@ -16,11 +16,16 @@ import java.util.Date;
 @Component
 @Slf4j
 public class JwtGenerator {
-    @Value("${jwt.secret}")
-    private String jwtSecret;
 
-    @Value("${jwt.expiration}")
-    private int jwtExpiration;
+    private final String jwtSecret;
+
+    private final int jwtExpiration;
+
+    public JwtGenerator(@Value("${jwt.secret}") String jwtSecret,
+                        @Value("${jwt.expiration}") int jwtExpiration) {
+        this.jwtSecret = jwtSecret;
+        this.jwtExpiration = jwtExpiration;
+    }
 
     public String generateJwtToken(final Authentication authentication) {
 
@@ -30,10 +35,11 @@ public class JwtGenerator {
         byte[] apiKeySecretBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
         SecretKey secretKey = Keys.hmacShaKeyFor(apiKeySecretBytes);
 
+        Instant now = Instant.now();
         String jwt = Jwts.builder()
                 .setSubject(userPrincipal.getUsername())
-                .setIssuedAt(Date.from(Instant.now()))
-                .setExpiration(Date.from(Instant.now().plusMillis(jwtExpiration)))
+                .setIssuedAt(Date.from(now))
+                .setExpiration(Date.from(now.plusMillis(jwtExpiration)))
                 .signWith(secretKey, SignatureAlgorithm.HS512)
                 .compact();
 

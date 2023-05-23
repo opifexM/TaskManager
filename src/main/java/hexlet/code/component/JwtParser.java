@@ -1,7 +1,11 @@
 package hexlet.code.component;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -12,14 +16,18 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Optional;
 
 @Component
 @Slf4j
 public class JwtParser {
-    @Value("${jwt.secret}")
-    private String jwtSecret;
+    private final String jwtSecret;
 
-    public Authentication parseJwtToken(String token) {
+    public JwtParser(@Value("${jwt.secret}") String jwtSecret) {
+        this.jwtSecret = jwtSecret;
+    }
+
+    public Optional<Authentication> parseJwtToken(String token) {
         try {
             byte[] apiKeySecretBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
             SecretKey secretKey = Keys.hmacShaKeyFor(apiKeySecretBytes);
@@ -33,12 +41,24 @@ public class JwtParser {
 
             if (user != null) {
                 log.info("User {} authenticated successfully", user);
-                return new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
+                return Optional.of(new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>()));
             }
-        } catch (Exception e) {
-            log.error("Can't extract login data from request", e);
-            throw new BadCredentialsException("Can't extract login data from request");
+        } catch (ExpiredJwtException e) {
+            log.error("JWT token is expired", e);
+            throw new BadCredentialsException("Expired JWT token", e);
+        } catch (UnsupportedJwtException e) {
+            log.error("JWT token is unsupported", e);
+            throw new BadCredentialsException("Unsupported JWT token", e);
+        } catch (MalformedJwtException e) {
+            log.error("JWT token is malformed", e);
+            throw new BadCredentialsException("Malformed JWT token", e);
+        } catch (SignatureException e) {
+            log.error("JWT signature does not match locally computed signature", e);
+            throw new BadCredentialsException("JWT signature does not match", e);
+        } catch (IllegalArgumentException e) {
+            log.error("JWT claims string is empty", e);
+            throw new BadCredentialsException("JWT claims string is empty", e);
         }
-        return null;
+        return Optional.empty();
     }
 }

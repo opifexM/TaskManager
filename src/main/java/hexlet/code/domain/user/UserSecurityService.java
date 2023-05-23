@@ -1,6 +1,5 @@
 package hexlet.code.domain.user;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -9,7 +8,6 @@ public class UserSecurityService {
 
     private final UserService userService;
 
-    @Autowired
     public UserSecurityService(UserService userService) {
         this.userService = userService;
     }
