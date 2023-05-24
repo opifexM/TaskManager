@@ -42,6 +42,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         log.info("Saving new user: {}", newUser);
         User savedUser = userRepository.save(newUser);
         savedUser.setPassword(null);
+        log.info("Successfully saved new user: {}", savedUser);
         return savedUser;
     }
 
@@ -58,6 +59,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 })
                 .orElseThrow(() -> UserNotFoundException.forId(id));
         savedUser.setPassword(null);
+        log.info("Successfully updated user {}", savedUser);
         return savedUser;
     }
 
@@ -68,6 +70,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw UserNotFoundException.forId(id);
         }
         userRepository.deleteById(id);
+        log.info("Successfully deleted user with ID: {}", id);
     }
 
     @Override

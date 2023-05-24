@@ -8,4 +8,7 @@
     <include file="db/changelog/changeset/001_create_users_table.xml"/>
     <include file="db/changelog/changeset/002_update_user_table.xml"/>
     <include file="db/changelog/changeset/003_update_user_table.xml"/>
+    <include file="db/changelog/changeset/004_update_user_table.xml"/>
+    <include file="db/changelog/changeset/005_create_statuses_table.xml"/>
+    <include file="db/changelog/changeset/006_update_users_table.xml"/>
 </databaseChangeLog>

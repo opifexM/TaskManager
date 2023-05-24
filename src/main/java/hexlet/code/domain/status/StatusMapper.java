@@ -1,4 +1,4 @@
-package hexlet.code.domain.user;
+package hexlet.code.domain.status;
 
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
@@ -8,25 +8,25 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
-public interface UserMapper {
-    User toEntity(UserDto userDto);
+public interface StatusMapper {
+    Status toEntity(StatusDto statusDto);
 
-    UserDto toDto(User user);
-
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    User partialUpdate(UserDto userDto, @MappingTarget User user);
-
-    User toEntity(UserCreationDto userCreationDTO);
-
-    UserCreationDto toCreationDto(User user);
+    StatusDto toDto(Status status);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    User partialUpdate(UserCreationDto userCreationDTO, @MappingTarget User user);
+    Status partialUpdate(StatusDto statusDto, @MappingTarget Status status);
 
-    User toEntity(UserChangingDto userChangingDTO);
+    Status toEntity(StatusCreationDto statusCreationDto);
 
-    UserChangingDto toChangingDto(User user);
+    StatusCreationDto toCreationDto(Status status);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    User partialUpdate(UserChangingDto userChangingDTO, @MappingTarget User user);
+    Status partialUpdate(StatusCreationDto statusCreationDto, @MappingTarget Status status);
+
+    Status toEntity(StatusChangingDto statusChangingDto);
+
+    StatusChangingDto toChangingDto(Status status);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    Status partialUpdate(StatusChangingDto statusChangingDto, @MappingTarget Status status);
 }

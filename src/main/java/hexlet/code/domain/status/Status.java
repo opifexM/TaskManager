@@ -1,6 +1,7 @@
-package hexlet.code.domain.user;
+package hexlet.code.domain.status;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -11,49 +12,37 @@ import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Getter
 @Setter
-@ToString(onlyExplicitlyIncluded = true)
+@ToString
 @Entity
-@Table(name = "users")
-public class User {
-    @ToString.Include
+@Table(name = "statuses")
+public class Status {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @ToString.Include
-    @Column(name = "first_name", nullable = false, length = 50)
-    private String firstName;
+    @Column(name = "name", nullable = false, unique = true, length = 50)
+    private String name;
 
-    @ToString.Include
-    @Column(name = "last_name", nullable = false, length = 50)
-    private String lastName;
-
-    @ToString.Include
-    @Column(name = "email", nullable = false, unique = true, length = 100)
-    private String email;
-
-    @ToString.Exclude
-    @Column(name = "password", length = 100)
-    private String password;
-
-    @ToString.Include
     @Column(name = "created_at")
     @CreationTimestamp
+    @Convert(converter = Jsr310JpaConverters.LocalDateTimeConverter.class)
     private LocalDateTime createdAt;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        User user = (User) o;
-        return getId() != null && Objects.equals(getId(), user.getId());
+        Status status = (Status) o;
+        return getId() != null && Objects.equals(getId(), status.getId());
     }
 
     @Override

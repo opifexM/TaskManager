@@ -1,6 +1,8 @@
 package hexlet.code.rest;
 
 import hexlet.code.domain.user.User;
+import hexlet.code.domain.user.UserChangingDto;
+import hexlet.code.domain.user.UserCreationDto;
 import hexlet.code.domain.user.UserDto;
 import hexlet.code.domain.user.UserMapper;
 import hexlet.code.domain.user.UserService;
@@ -54,18 +56,24 @@ public class UserController {
 
     @PostMapping("")
     @Operation(summary = "Create a new user", description = "Creates a new user")
-    public UserDto createUser(@Valid @RequestBody @Parameter(description = "User object") final User newUser) {
-        log.info("Creating a new user: {}", newUser);
-        return userMapper.toDto(userService.save(newUser));
+    public UserDto createUser(
+            @Valid @RequestBody @Parameter(description = "User object") final UserCreationDto userCreationDTO) {
+        log.info("Creating a new user: {}", userCreationDTO);
+        User userToCreate = userMapper.toEntity(userCreationDTO);
+        User savedUser = userService.save(userToCreate);
+        return userMapper.toDto(savedUser);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("@userSecurityService.isOwner(#id)")
     @Operation(summary = "Update user by ID", description = "Updates user information by ID")
-    public UserDto updateUser(@Valid @RequestBody @Parameter(description = "Updated user object") final User updatedUser,
-                              @PathVariable("id") @Parameter(description = "User ID") final long id) {
-        log.info("Updating user with ID: {} with data: {}", id, updatedUser);
-        return userMapper.toDto(userService.updateById(updatedUser, id));
+    public UserDto updateUser(
+            @Valid @RequestBody @Parameter(description = "Updated user object") final UserChangingDto userChangingDTO,
+            @PathVariable("id") @Parameter(description = "User ID") final long id) {
+        log.info("Updating user with ID: {} with data: {}", id, userChangingDTO);
+        User userToUpdate = userMapper.toEntity(userChangingDTO);
+        User updatedUser = userService.updateById(userToUpdate, id);
+        return userMapper.toDto(updatedUser);
     }
 
     @DeleteMapping("/{id}")

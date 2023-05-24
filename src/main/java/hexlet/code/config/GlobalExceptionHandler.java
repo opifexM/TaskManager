@@ -1,6 +1,8 @@
 package hexlet.code.config;
 
+import hexlet.code.domain.exception.StatusNotFoundException;
 import hexlet.code.domain.exception.UserNotFoundException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -20,6 +22,11 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
+    @ExceptionHandler(StatusNotFoundException.class)
+    public ResponseEntity<String> handleStatusNotFoundException(final StatusNotFoundException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleValidationExceptions(final MethodArgumentNotValidException ex, final WebRequest request) {
         final Map<String, String> errors = new HashMap<>();
@@ -32,11 +39,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
-    // Новый метод для обработки исключений Spring Security
-    // обрабатываем исключения типа AccessDeniedException когда отказано в доступе к ресурсу или методу
-    // В ответ на исключение возвращаем статус HTTP 403 (Forbidden) и сообщение "Access Denied".
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<String> handleAccessDeniedException(final AccessDeniedException e) {
         return new ResponseEntity<>("Access Denied", HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<String> handleDataIntegrityViolation(final DataIntegrityViolationException e) {
+        return new ResponseEntity<>("Data integrity violation", HttpStatus.CONFLICT);
     }
 }
