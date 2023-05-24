@@ -1,6 +1,8 @@
 package hexlet.code.domain.task;
 
 import hexlet.code.domain.exception.TaskNotFoundException;
+import hexlet.code.domain.status.StatusService;
+import hexlet.code.domain.user.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -11,9 +13,13 @@ import java.util.List;
 public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
+    private final StatusService statusService;
+    private final UserService userService;
 
-    public TaskServiceImpl(TaskRepository taskRepository) {
+    public TaskServiceImpl(TaskRepository taskRepository, StatusService statusService, UserService userService) {
         this.taskRepository = taskRepository;
+        this.statusService = statusService;
+        this.userService = userService;
     }
 
     @Override
@@ -39,6 +45,26 @@ public class TaskServiceImpl implements TaskService {
         Task savedTask = taskRepository.save(newTask);
         log.info("Successfully saved new status: {}", savedTask);
         return savedTask;
+    }
+
+    @Override
+    public Task createTask(Task newTask, long taskStatusId, long authorId, long executorId) {
+        newTask.setTaskStatus(statusService.findById(taskStatusId));
+        newTask.setAuthor(userService.findById(authorId));
+        if (executorId > 0) {
+            newTask.setExecutor(userService.findById(executorId));
+        }
+        return save(newTask);
+    }
+
+    @Override
+    public Task updateTask(Task taskToUpdate, long taskStatusId, long authorId, long executorId, long id) {
+        taskToUpdate.setTaskStatus(statusService.findById(taskStatusId));
+        taskToUpdate.setAuthor(userService.findById(authorId));
+        if (executorId > 0) {
+            taskToUpdate.setExecutor(userService.findById(executorId));
+        }
+        return updateById(taskToUpdate, id);
     }
 
     @Override

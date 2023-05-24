@@ -9,6 +9,10 @@ public interface TaskService {
 
     Task save(Task newTask);
 
+    Task createTask(Task newTask, long taskStatusId, long authorId, long executorId);
+
+    Task updateTask(Task taskToUpdate, long taskStatusId, long authorId, long executorId, long id);
+
     Task updateById(Task updatedTask, long id);
 
     void deleteById(long id);

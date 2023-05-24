@@ -1,16 +1,14 @@
 package hexlet.code.domain.task;
 
-import hexlet.code.domain.status.StatusMapper;
-import hexlet.code.domain.user.UserMapper;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING,
-        uses = {StatusMapper.class, UserMapper.class, UserMapper.class})
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
 public interface TaskMapper {
     Task toEntity(TaskDto taskDto);
 
@@ -18,4 +16,14 @@ public interface TaskMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Task partialUpdate(TaskDto taskDto, @MappingTarget Task task);
+
+    @Mapping(target = "taskStatus", ignore = true)
+    @Mapping(target = "author", ignore = true)
+    @Mapping(target = "executor", ignore = true)
+    Task toEntity(TaskCreationDto taskCreationDto);
+
+    @Mapping(target = "taskStatus", ignore = true)
+    @Mapping(target = "author", ignore = true)
+    @Mapping(target = "executor", ignore = true)
+    Task toEntity(TaskChangingDto taskChangingDto);
 }

@@ -1,15 +1,11 @@
 package hexlet.code.rest;
 
-import hexlet.code.domain.status.Status;
-import hexlet.code.domain.status.StatusService;
 import hexlet.code.domain.task.Task;
 import hexlet.code.domain.task.TaskChangingDto;
 import hexlet.code.domain.task.TaskCreationDto;
 import hexlet.code.domain.task.TaskDto;
 import hexlet.code.domain.task.TaskMapper;
 import hexlet.code.domain.task.TaskService;
-import hexlet.code.domain.user.User;
-import hexlet.code.domain.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,8 +23,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-
-import static java.util.Objects.nonNull;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("${base-url}" + "/tasks")
@@ -38,16 +33,10 @@ public class TaskController {
     private final TaskMapper taskMapper;
 
     private final TaskService taskService;
-    private final StatusService statusService;
-    private final UserService userService;
 
-
-    public TaskController(TaskMapper taskMapper, TaskService taskService,
-                          StatusService statusService, UserService userService) {
+    public TaskController(TaskMapper taskMapper, TaskService taskService) {
         this.taskMapper = taskMapper;
         this.taskService = taskService;
-        this.statusService = statusService;
-        this.userService = userService;
     }
 
     @GetMapping("")
@@ -70,20 +59,12 @@ public class TaskController {
             @Valid @RequestBody @Parameter(description = "Task object") final TaskCreationDto taskCreationDto) {
         log.info("Creating a new task: {}", taskCreationDto);
 
-        Status status = statusService.findById(taskCreationDto.getTaskStatusId());
-        User author = userService.findById(taskCreationDto.getAuthorId());
+        Task taskToCreate = taskMapper.toEntity(taskCreationDto);
+        long taskStatusId = Optional.of(taskCreationDto.getTaskStatusId()).orElse(0L);
+        long authorId = Optional.of(taskCreationDto.getAuthorId()).orElse(0L);
+        long executorId = Optional.ofNullable(taskCreationDto.getExecutorId()).orElse(0L);
 
-        Task taskToCreate = new Task();
-        taskToCreate.setName(taskCreationDto.getName());
-        taskToCreate.setDescription(taskCreationDto.getDescription());
-        taskToCreate.setTaskStatus(status);
-        taskToCreate.setAuthor(author);
-        if (nonNull(taskCreationDto.getExecutorId())) {
-            User executor = userService.findById(taskCreationDto.getExecutorId());
-            taskToCreate.setExecutor(executor);
-        }
-
-        Task savedTask = taskService.save(taskToCreate);
+        Task savedTask = taskService.createTask(taskToCreate, taskStatusId, authorId, executorId);
         return taskMapper.toDto(savedTask);
     }
 
@@ -94,20 +75,12 @@ public class TaskController {
             @PathVariable("id") @Parameter(description = "Task ID") final long id) {
         log.info("Updating task with ID: {} with data: {}", id, taskChangingDto);
 
-        Task taskToUpdate = taskService.findById(id);
-        Status status = statusService.findById(taskChangingDto.getTaskStatusId());
-        User author = userService.findById(taskChangingDto.getAuthorId());
+        Task taskToUpdate = taskMapper.toEntity(taskChangingDto);
+        long taskStatusId = Optional.of(taskChangingDto.getTaskStatusId()).orElse(0L);
+        long authorId = Optional.of(taskChangingDto.getAuthorId()).orElse(0L);
+        long executorId = Optional.ofNullable(taskChangingDto.getExecutorId()).orElse(0L);
 
-        taskToUpdate.setName(taskChangingDto.getName());
-        taskToUpdate.setDescription(taskChangingDto.getDescription());
-        taskToUpdate.setTaskStatus(status);
-        taskToUpdate.setAuthor(author);
-        if (nonNull(taskChangingDto.getExecutorId())) {
-            User executor = userService.findById(taskChangingDto.getExecutorId());
-            taskToUpdate.setExecutor(executor);
-        }
-
-        Task updatedTask = taskService.updateById(taskToUpdate, id);
+        Task updatedTask = taskService.updateTask(taskToUpdate, taskStatusId, authorId, executorId, id);
         return taskMapper.toDto(updatedTask);
     }
 

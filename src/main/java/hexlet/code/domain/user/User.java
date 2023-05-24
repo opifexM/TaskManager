@@ -17,7 +17,7 @@ import java.util.Objects;
 
 @Getter
 @Setter
-@ToString(onlyExplicitlyIncluded = true)
+@ToString
 @Entity
 @Table(name = "users")
 public class User {
