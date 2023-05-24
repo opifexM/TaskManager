@@ -26,7 +26,11 @@ public class StatusServiceImpl implements StatusService {
     public Status findById(Long id) {
         log.info("Retrieving status with ID: {}", id);
         return statusRepository.findById(id)
-                .orElseThrow(() -> StatusNotFoundException.forId(id));
+                .orElseThrow(() -> {
+                    String message = String.format("Failed to retrieve status. Status with id %d not found.", id);
+                    log.error(message);
+                    return new StatusNotFoundException(message);
+                });
     }
 
     @Override
@@ -45,7 +49,11 @@ public class StatusServiceImpl implements StatusService {
                     status.setName(updatedStatus.getName());
                     return statusRepository.save(status);
                 })
-                .orElseThrow(() -> StatusNotFoundException.forId(id));
+                .orElseThrow(() -> {
+                    String message = String.format("Failed to update status. Status with id %d not found.", id);
+                    log.error(message);
+                    return new StatusNotFoundException(message);
+                });
         log.info("Successfully updated status {}", savedStatus);
         return savedStatus;
     }
@@ -54,7 +62,9 @@ public class StatusServiceImpl implements StatusService {
     public void deleteById(long id) {
         log.info("Deleting status with ID: {}", id);
         if (!statusRepository.existsById(id)) {
-            throw StatusNotFoundException.forId(id);
+            String message = String.format("Failed to delete status. Status with ID %d not found.", id);
+            log.error(message);
+            throw new StatusNotFoundException(message);
         }
         statusRepository.deleteById(id);
         log.info("Successfully deleted status with ID: {}", id);

@@ -33,7 +33,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public User findById(final Long id) {
         log.info("Retrieving user with ID: {}", id);
         return userRepository.findById(id)
-                .orElseThrow(() -> UserNotFoundException.forId(id));
+                .orElseThrow(() -> {
+                    String message = String.format("Failed to retrieve user. User with id %d not found.", id);
+                    log.error(message);
+                    return new UserNotFoundException(message);
+                });
     }
 
     @Override
@@ -57,7 +61,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                     user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
                     return userRepository.save(user);
                 })
-                .orElseThrow(() -> UserNotFoundException.forId(id));
+                .orElseThrow(() -> {
+                    String message = String.format("Failed to update user. User with id %d not found.", id);
+                    log.error(message);
+                    return new UserNotFoundException(message);
+                });
         savedUser.setPassword(null);
         log.info("Successfully updated user {}", savedUser);
         return savedUser;
@@ -67,7 +75,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public void deleteById(final long id) {
         log.info("Deleting user with ID: {}", id);
         if (!userRepository.existsById(id)) {
-            throw UserNotFoundException.forId(id);
+            String message = String.format("Failed to delete user. User with ID %d not found.", id);
+            log.error(message);
+            throw new UserNotFoundException(message);
         }
         userRepository.deleteById(id);
         log.info("Successfully deleted user with ID: {}", id);
@@ -79,8 +89,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return userRepository.findByEmail(email)
                 .map(this::toSpringUser)
                 .orElseThrow(() -> {
-                    log.error("User not found for email: {}", email);
-                    return new UsernameNotFoundException(email);
+                    String message = String.format("Failed to load user. User with email %s not found.", email);
+                    log.error(message);
+                    return new UserNotFoundException(message);
                 });
     }
 

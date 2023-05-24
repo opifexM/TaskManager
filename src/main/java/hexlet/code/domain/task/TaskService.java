@@ -9,11 +9,7 @@ public interface TaskService {
 
     Task save(Task newTask);
 
-    Task createTask(TaskCreationDto taskCreationDto);
-
     Task updateById(Task updatedTask, long id);
 
     void deleteById(long id);
-
-    Task updateTask(TaskChangingDto taskChangingDto, long id);
 }

@@ -1,11 +1,15 @@
 package hexlet.code.rest;
 
+import hexlet.code.domain.status.Status;
+import hexlet.code.domain.status.StatusService;
 import hexlet.code.domain.task.Task;
 import hexlet.code.domain.task.TaskChangingDto;
 import hexlet.code.domain.task.TaskCreationDto;
 import hexlet.code.domain.task.TaskDto;
 import hexlet.code.domain.task.TaskMapper;
 import hexlet.code.domain.task.TaskService;
+import hexlet.code.domain.user.User;
+import hexlet.code.domain.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,6 +28,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+import static java.util.Objects.nonNull;
+
 @RestController
 @RequestMapping("${base-url}" + "/tasks")
 @Tag(name = "Task Management", description = "Task management API")
@@ -32,11 +38,16 @@ public class TaskController {
     private final TaskMapper taskMapper;
 
     private final TaskService taskService;
+    private final StatusService statusService;
+    private final UserService userService;
 
 
-    public TaskController(TaskMapper taskMapper, TaskService taskService) {
+    public TaskController(TaskMapper taskMapper, TaskService taskService,
+                          StatusService statusService, UserService userService) {
         this.taskMapper = taskMapper;
         this.taskService = taskService;
+        this.statusService = statusService;
+        this.userService = userService;
     }
 
     @GetMapping("")
@@ -58,7 +69,21 @@ public class TaskController {
     public TaskDto createTask(
             @Valid @RequestBody @Parameter(description = "Task object") final TaskCreationDto taskCreationDto) {
         log.info("Creating a new task: {}", taskCreationDto);
-        Task savedTask = taskService.createTask(taskCreationDto);
+
+        Status status = statusService.findById(taskCreationDto.getTaskStatusId());
+        User author = userService.findById(taskCreationDto.getAuthorId());
+
+        Task taskToCreate = new Task();
+        taskToCreate.setName(taskCreationDto.getName());
+        taskToCreate.setDescription(taskCreationDto.getDescription());
+        taskToCreate.setTaskStatus(status);
+        taskToCreate.setAuthor(author);
+        if (nonNull(taskCreationDto.getExecutorId())) {
+            User executor = userService.findById(taskCreationDto.getExecutorId());
+            taskToCreate.setExecutor(executor);
+        }
+
+        Task savedTask = taskService.save(taskToCreate);
         return taskMapper.toDto(savedTask);
     }
 
@@ -69,7 +94,20 @@ public class TaskController {
             @PathVariable("id") @Parameter(description = "Task ID") final long id) {
         log.info("Updating task with ID: {} with data: {}", id, taskChangingDto);
 
-        Task updatedTask = taskService.updateTask(taskChangingDto, id);
+        Task taskToUpdate = taskService.findById(id);
+        Status status = statusService.findById(taskChangingDto.getTaskStatusId());
+        User author = userService.findById(taskChangingDto.getAuthorId());
+
+        taskToUpdate.setName(taskChangingDto.getName());
+        taskToUpdate.setDescription(taskChangingDto.getDescription());
+        taskToUpdate.setTaskStatus(status);
+        taskToUpdate.setAuthor(author);
+        if (nonNull(taskChangingDto.getExecutorId())) {
+            User executor = userService.findById(taskChangingDto.getExecutorId());
+            taskToUpdate.setExecutor(executor);
+        }
+
+        Task updatedTask = taskService.updateById(taskToUpdate, id);
         return taskMapper.toDto(updatedTask);
     }
 
