@@ -62,7 +62,7 @@ public class WebSecurityConfig {
                                         ),
                                         RequestMatchers.not(new AntPathRequestMatcher(baseUrl + "/**"))
                                 ).permitAll()
-                                // .requestMatchers("/**").permitAll()
+                                .requestMatchers("/**").permitAll()
                                 .anyRequest().authenticated()
                 )
 

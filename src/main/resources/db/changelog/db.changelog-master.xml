@@ -11,4 +11,5 @@
     <include file="db/changelog/changeset/004_update_user_table.xml"/>
     <include file="db/changelog/changeset/005_create_statuses_table.xml"/>
     <include file="db/changelog/changeset/006_update_users_table.xml"/>
+    <include file="db/changelog/changeset/007_create_tasks_table.xml"/>
 </databaseChangeLog>
