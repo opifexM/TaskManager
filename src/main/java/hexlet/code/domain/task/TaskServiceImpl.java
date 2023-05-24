@@ -1,6 +1,7 @@
 package hexlet.code.domain.task;
 
-import hexlet.code.domain.exception.TaskNotFoundException;
+import hexlet.code.exception.DuplicateTaskException;
+import hexlet.code.exception.TaskNotFoundException;
 import hexlet.code.domain.status.StatusService;
 import hexlet.code.domain.user.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +34,7 @@ public class TaskServiceImpl implements TaskService {
         log.info("Retrieving task with ID: {}", id);
         return taskRepository.findById(id)
                 .orElseThrow(() -> {
-                    String message = String.format("Failed to retrieve task. Task with id %d not found.", id);
+                    String message = String.format("Failed to retrieve task. Task with ID %d not found.", id);
                     log.error(message);
                     return new TaskNotFoundException(message);
                 });
@@ -42,6 +43,11 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public Task save(Task newTask) {
         log.info("Saving new task: {}", newTask);
+        if (taskRepository.findByName(newTask.getName()).isPresent()) {
+            String message = String.format("Failed to save task. Task with name '%s' already exists.", newTask.getName());
+            log.error(message);
+            throw new DuplicateTaskException(message);
+        }
         Task savedTask = taskRepository.save(newTask);
         log.info("Successfully saved new status: {}", savedTask);
         return savedTask;
@@ -80,7 +86,7 @@ public class TaskServiceImpl implements TaskService {
                     return taskRepository.save(task);
                 })
                 .orElseThrow(() -> {
-                    String message = String.format("Failed to update task. Task with id %d not found.", id);
+                    String message = String.format("Failed to update task. Task with ID %d not found.", id);
                     log.error(message);
                     return new TaskNotFoundException(message);
                 });

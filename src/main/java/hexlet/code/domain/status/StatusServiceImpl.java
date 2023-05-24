@@ -1,6 +1,7 @@
 package hexlet.code.domain.status;
 
-import hexlet.code.domain.exception.StatusNotFoundException;
+import hexlet.code.exception.DuplicateStatusException;
+import hexlet.code.exception.StatusNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +28,7 @@ public class StatusServiceImpl implements StatusService {
         log.info("Retrieving status with ID: {}", id);
         return statusRepository.findById(id)
                 .orElseThrow(() -> {
-                    String message = String.format("Failed to retrieve status. Status with id %d not found.", id);
+                    String message = String.format("Failed to retrieve status. Status with ID %d not found.", id);
                     log.error(message);
                     return new StatusNotFoundException(message);
                 });
@@ -36,6 +37,11 @@ public class StatusServiceImpl implements StatusService {
     @Override
     public Status save(Status newStatus) {
         log.info("Saving new status: {}", newStatus);
+        if (statusRepository.findByName(newStatus.getName()).isPresent()) {
+            String message = String.format("Failed to save status. Status with name '%s' already exists.", newStatus.getName());
+            log.error(message);
+            throw new DuplicateStatusException(message);
+        }
         Status savedStatus = statusRepository.save(newStatus);
         log.info("Successfully saved new status: {}", savedStatus);
         return savedStatus;
@@ -50,7 +56,7 @@ public class StatusServiceImpl implements StatusService {
                     return statusRepository.save(status);
                 })
                 .orElseThrow(() -> {
-                    String message = String.format("Failed to update status. Status with id %d not found.", id);
+                    String message = String.format("Failed to update status. Status with ID %d not found.", id);
                     log.error(message);
                     return new StatusNotFoundException(message);
                 });

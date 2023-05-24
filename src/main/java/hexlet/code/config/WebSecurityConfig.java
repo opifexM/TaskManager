@@ -62,6 +62,7 @@ public class WebSecurityConfig {
                                         ),
                                         RequestMatchers.not(new AntPathRequestMatcher(baseUrl + "/**"))
                                 ).permitAll()
+                                // todo
                                 .requestMatchers("/**").permitAll()
                                 .anyRequest().authenticated()
                 )

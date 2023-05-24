@@ -1,6 +1,7 @@
 package hexlet.code.domain.user;
 
-import hexlet.code.domain.exception.UserNotFoundException;
+import hexlet.code.exception.DuplicateUserException;
+import hexlet.code.exception.UserNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -34,7 +35,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         log.info("Retrieving user with ID: {}", id);
         return userRepository.findById(id)
                 .orElseThrow(() -> {
-                    String message = String.format("Failed to retrieve user. User with id %d not found.", id);
+                    String message = String.format("Failed to retrieve user. User with ID %d not found.", id);
                     log.error(message);
                     return new UserNotFoundException(message);
                 });
@@ -42,8 +43,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public User save(final User newUser) {
-        newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
         log.info("Saving new user: {}", newUser);
+        if (userRepository.findByEmail(newUser.getEmail()).isPresent()) {
+            String message = String.format("Failed to save user. User with email '%s' already exists.", newUser.getEmail());
+            log.error(message);
+            throw new DuplicateUserException(message);
+        }
+        newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
         User savedUser = userRepository.save(newUser);
         savedUser.setPassword(null);
         log.info("Successfully saved new user: {}", savedUser);
@@ -62,7 +68,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                     return userRepository.save(user);
                 })
                 .orElseThrow(() -> {
-                    String message = String.format("Failed to update user. User with id %d not found.", id);
+                    String message = String.format("Failed to update user. User with ID %d not found.", id);
                     log.error(message);
                     return new UserNotFoundException(message);
                 });
@@ -89,7 +95,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return userRepository.findByEmail(email)
                 .map(this::toSpringUser)
                 .orElseThrow(() -> {
-                    String message = String.format("Failed to load user. User with email %s not found.", email);
+                    String message = String.format("Failed to load user. User with email '%s' not found.", email);
                     log.error(message);
                     return new UserNotFoundException(message);
                 });
