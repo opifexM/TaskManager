@@ -1,21 +1,22 @@
 package hexlet.code.domain.status;
 
+import hexlet.code.domain.task.TaskRepository;
 import hexlet.code.exception.DuplicateStatusException;
+import hexlet.code.exception.StatusAssociatedWithTaskException;
 import hexlet.code.exception.StatusNotFoundException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class StatusServiceImpl implements StatusService {
 
     private final StatusRepository statusRepository;
-
-    public StatusServiceImpl(StatusRepository statusRepository) {
-        this.statusRepository = statusRepository;
-    }
+    private final TaskRepository taskRepository;
 
     @Override
     public List<Status> findAll() {
@@ -71,6 +72,11 @@ public class StatusServiceImpl implements StatusService {
             String message = String.format("Failed to delete status. Status with ID %d not found.", id);
             log.error(message);
             throw new StatusNotFoundException(message);
+        }
+        if (taskRepository.existsByTaskStatus_Id(id)) {
+            String message = String.format("Status with ID %d is associated with a task, cannot delete.", id);
+            log.error(message);
+            throw new StatusAssociatedWithTaskException(message);
         }
         statusRepository.deleteById(id);
         log.info("Successfully deleted status with ID: {}", id);

@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.Set;
 
 /**
  * DTO for {@link Task}
@@ -18,15 +19,17 @@ import java.io.Serializable;
 public class TaskCreationDto implements Serializable {
     @Size(message = "Task name must be between 1 and 255 characters", min = 1, max = 255)
     @NotBlank(message = "Task name cannot be blank")
-    String name;
+    private String name;
 
-    String description;
+    private String description;
 
     @NotNull(message = "Task status cannot be Null")
-    Long taskStatusId;
+    private Long taskStatusId;
 
-    @NotNull(message = "Task author cannot be Null")
-    Long authorId;
+    // @NotNull(message = "Task author cannot be Null")
+    private Long authorId;
 
-    Long executorId;
+    private Long executorId;
+
+    private Set<Long> labelIds;
 }

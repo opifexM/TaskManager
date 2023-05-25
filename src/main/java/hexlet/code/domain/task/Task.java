@@ -1,5 +1,6 @@
 package hexlet.code.domain.task;
 
+import hexlet.code.domain.label.Label;
 import hexlet.code.domain.status.Status;
 import hexlet.code.domain.user.User;
 import jakarta.persistence.Column;
@@ -9,6 +10,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -19,7 +22,9 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -57,6 +62,13 @@ public class Task {
     @CreationTimestamp
     @Convert(converter = Jsr310JpaConverters.LocalDateTimeConverter.class)
     private LocalDateTime createdAt;
+
+    @ToString.Exclude
+    @ManyToMany
+    @JoinTable(name = "tasks_labels",
+            joinColumns = @JoinColumn(name = "task_id"),
+            inverseJoinColumns = @JoinColumn(name = "labels_id"))
+    private Set<Label> labels = new LinkedHashSet<>();
 
     @Override
     public boolean equals(Object o) {

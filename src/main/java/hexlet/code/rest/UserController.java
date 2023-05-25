@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,17 +29,12 @@ import java.util.List;
 @RestController
 @RequestMapping("${base-url}" + "/users")
 @Tag(name = "User Management", description = "User management API")
+@RequiredArgsConstructor
 @Slf4j
 public class UserController {
     private final UserMapper userMapper;
 
     private final UserService userService;
-
-    public UserController(final UserService userService,
-                          final UserMapper userMapper) {
-        this.userService = userService;
-        this.userMapper = userMapper;
-    }
 
     @GetMapping("")
     @Operation(summary = "List all users", description = "Retrieves all users")

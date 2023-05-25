@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,16 +28,12 @@ import java.util.List;
 @RestController
 @RequestMapping("${base-url}" + "/statuses")
 @Tag(name = "Status Management", description = "Status management API")
+@RequiredArgsConstructor
 @Slf4j
 public class StatusController {
     private final StatusMapper statusMapper;
 
     private final StatusService statusService;
-
-    public StatusController(StatusMapper statusMapper, StatusService statusService) {
-        this.statusMapper = statusMapper;
-        this.statusService = statusService;
-    }
 
     @GetMapping("")
     @Operation(summary = "List all statuses", description = "Retrieves all statuses")

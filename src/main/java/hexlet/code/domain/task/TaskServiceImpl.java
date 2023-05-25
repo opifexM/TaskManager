@@ -1,27 +1,28 @@
 package hexlet.code.domain.task;
 
-import hexlet.code.exception.DuplicateTaskException;
-import hexlet.code.exception.TaskNotFoundException;
+import hexlet.code.domain.label.Label;
+import hexlet.code.domain.label.LabelService;
 import hexlet.code.domain.status.StatusService;
 import hexlet.code.domain.user.UserService;
+import hexlet.code.exception.DuplicateTaskException;
+import hexlet.code.exception.TaskNotFoundException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
     private final StatusService statusService;
     private final UserService userService;
-
-    public TaskServiceImpl(TaskRepository taskRepository, StatusService statusService, UserService userService) {
-        this.taskRepository = taskRepository;
-        this.statusService = statusService;
-        this.userService = userService;
-    }
+    private final LabelService labelService;
 
     @Override
     public List<Task> findAll() {
@@ -54,22 +55,31 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Task createTask(Task newTask, long taskStatusId, long authorId, long executorId) {
+    public Task createTask(Task newTask, long taskStatusId, long authorId, long executorId, Set<Long> labelIds) {
         newTask.setTaskStatus(statusService.findById(taskStatusId));
         newTask.setAuthor(userService.findById(authorId));
         if (executorId > 0) {
             newTask.setExecutor(userService.findById(executorId));
         }
+        Set<Label> labelSet = labelIds.stream()
+                .map(labelService::findById)
+                .collect(Collectors.toSet());
+        newTask.setLabels(labelSet);
         return save(newTask);
     }
 
     @Override
-    public Task updateTask(Task taskToUpdate, long taskStatusId, long authorId, long executorId, long id) {
+    public Task updateTask(Task taskToUpdate, long taskStatusId, long authorId,
+                           long executorId, Set<Long> labelIds, long id) {
         taskToUpdate.setTaskStatus(statusService.findById(taskStatusId));
         taskToUpdate.setAuthor(userService.findById(authorId));
         if (executorId > 0) {
             taskToUpdate.setExecutor(userService.findById(executorId));
         }
+        Set<Label> labelSet = labelIds.stream()
+                .map(labelService::findById)
+                .collect(Collectors.toSet());
+        taskToUpdate.setLabels(labelSet);
         return updateById(taskToUpdate, id);
     }
 
@@ -83,6 +93,7 @@ public class TaskServiceImpl implements TaskService {
                     task.setTaskStatus(updatedTask.getTaskStatus());
                     task.setAuthor(updatedTask.getAuthor());
                     task.setExecutor(updatedTask.getExecutor());
+                    task.setLabels(updatedTask.getLabels());
                     return taskRepository.save(task);
                 })
                 .orElseThrow(() -> {
@@ -105,5 +116,4 @@ public class TaskServiceImpl implements TaskService {
         taskRepository.deleteById(id);
         log.info("Successfully deleted task with ID: {}", id);
     }
-
 }

@@ -1,7 +1,10 @@
 package hexlet.code.domain.user;
 
+import hexlet.code.domain.task.TaskRepository;
 import hexlet.code.exception.DuplicateUserException;
+import hexlet.code.exception.UserAssociatedWithTaskException;
 import hexlet.code.exception.UserNotFoundException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,16 +16,12 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
-    public UserServiceImpl(final UserRepository userRepository,
-                           final PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
+    private final TaskRepository taskRepository;
 
     @Override
     public List<User> findAll() {
@@ -84,6 +83,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             String message = String.format("Failed to delete user. User with ID %d not found.", id);
             log.error(message);
             throw new UserNotFoundException(message);
+        }
+        if (taskRepository.existsByAuthor_IdOrExecutor_Id(id, id)) {
+            String message = String.format("Status with ID %d is associated with a task, cannot delete.", id);
+            log.error(message);
+            throw new UserAssociatedWithTaskException(message);
         }
         userRepository.deleteById(id);
         log.info("Successfully deleted user with ID: {}", id);

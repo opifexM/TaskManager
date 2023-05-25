@@ -12,18 +12,19 @@ import org.mapstruct.ReportingPolicy;
 public interface TaskMapper {
     Task toEntity(TaskDto taskDto);
 
-    TaskDto toDto(Task task);
-
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Task partialUpdate(TaskDto taskDto, @MappingTarget Task task);
-
     @Mapping(target = "taskStatus", ignore = true)
     @Mapping(target = "author", ignore = true)
     @Mapping(target = "executor", ignore = true)
+    @Mapping(target = "labels", ignore = true)
     Task toEntity(TaskCreationDto taskCreationDto);
 
     @Mapping(target = "taskStatus", ignore = true)
     @Mapping(target = "author", ignore = true)
-    @Mapping(target = "executor", ignore = true)
+    @Mapping(target = "labels", ignore = true)
     Task toEntity(TaskChangingDto taskChangingDto);
+
+    TaskDto toDto(Task task);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    Task partialUpdate(TaskDto taskDto, @MappingTarget Task task);
 }

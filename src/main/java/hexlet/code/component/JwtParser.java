@@ -45,19 +45,19 @@ public class JwtParser {
             }
         } catch (ExpiredJwtException e) {
             log.error("JWT token is expired", e);
-            throw new BadCredentialsException("Expired JWT token", e);
+            throw new BadCredentialsException("Expired JWT token");
         } catch (UnsupportedJwtException e) {
             log.error("JWT token is unsupported", e);
-            throw new BadCredentialsException("Unsupported JWT token", e);
+            throw new BadCredentialsException("Unsupported JWT token");
         } catch (MalformedJwtException e) {
             log.error("JWT token is malformed", e);
-            throw new BadCredentialsException("Malformed JWT token", e);
+            throw new BadCredentialsException("Malformed JWT token");
         } catch (SignatureException e) {
-            log.error("JWT signature does not match locally computed signature", e);
-            throw new BadCredentialsException("JWT signature does not match", e);
+            log.error("JWT signature does not match locally computed signature");
+            throw new BadCredentialsException("JWT signature does not match");
         } catch (IllegalArgumentException e) {
             log.error("JWT claims string is empty", e);
-            throw new BadCredentialsException("JWT claims string is empty", e);
+            throw new BadCredentialsException("JWT claims string is empty");
         }
         return Optional.empty();
     }

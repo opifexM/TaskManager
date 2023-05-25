@@ -17,5 +17,5 @@ import java.io.Serializable;
 public class StatusCreationDto implements Serializable {
     @Size(message = "Status name must be between 1 and 50 characters", min = 1, max = 50)
     @NotBlank(message = "Status name cannot be blank")
-    String name;
+    private String name;
 }

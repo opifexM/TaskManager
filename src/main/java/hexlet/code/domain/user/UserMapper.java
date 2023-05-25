@@ -11,21 +11,21 @@ import org.mapstruct.ReportingPolicy;
 public interface UserMapper {
     User toEntity(UserDto userDto);
 
+    User toEntity(UserCreationDto userCreationDTO);
+
+    User toEntity(UserChangingDto userChangingDTO);
+
     UserDto toDto(User user);
+
+    UserCreationDto toCreationDto(User user);
+
+    UserChangingDto toChangingDto(User user);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     User partialUpdate(UserDto userDto, @MappingTarget User user);
 
-    User toEntity(UserCreationDto userCreationDTO);
-
-    UserCreationDto toCreationDto(User user);
-
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     User partialUpdate(UserCreationDto userCreationDTO, @MappingTarget User user);
-
-    User toEntity(UserChangingDto userChangingDTO);
-
-    UserChangingDto toChangingDto(User user);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     User partialUpdate(UserChangingDto userChangingDTO, @MappingTarget User user);

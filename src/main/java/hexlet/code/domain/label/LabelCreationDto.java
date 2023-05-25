@@ -1,4 +1,4 @@
-package hexlet.code.domain.status;
+package hexlet.code.domain.label;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -9,13 +9,13 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 
 /**
- * DTO for {@link Status}
+ * DTO for {@link Label}
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class StatusChangingDto implements Serializable {
-    @Size(message = "Status name must be between 1 and 50 characters", min = 1, max = 50)
-    @NotBlank(message = "Status name cannot be blank")
+public class LabelCreationDto implements Serializable {
+    @Size(message = "Label name must be between 1 and 50 characters", min = 1, max = 50)
+    @NotBlank(message = "Label name cannot be blank")
     private String name;
 }

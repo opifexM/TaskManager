@@ -1,4 +1,4 @@
-package hexlet.code.domain.status;
+package hexlet.code.domain.label;
 
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
@@ -8,25 +8,25 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
-public interface StatusMapper {
-    Status toEntity(StatusDto statusDto);
+public interface LabelMapper {
+    Label toEntity(LabelDto labelDto);
 
-    Status toEntity(StatusCreationDto statusCreationDto);
+    Label toEntity(LabelChangingDto labelChangingDto);
 
-    Status toEntity(StatusChangingDto statusChangingDto);
+    Label toEntity(LabelCreationDto labelCreationDto);
 
-    StatusDto toDto(Status status);
+    LabelDto toDto(Label label);
 
-    StatusCreationDto toCreationDto(Status status);
+    LabelCreationDto toCreationDto(Label label);
 
-    StatusChangingDto toChangingDto(Status status);
-
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Status partialUpdate(StatusDto statusDto, @MappingTarget Status status);
+    LabelChangingDto toChangingDto(Label label);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Status partialUpdate(StatusCreationDto statusCreationDto, @MappingTarget Status status);
+    Label partialUpdate(LabelDto labelDto, @MappingTarget Label label);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Status partialUpdate(StatusChangingDto statusChangingDto, @MappingTarget Status status);
+    Label partialUpdate(LabelCreationDto labelCreationDto, @MappingTarget Label label);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    Label partialUpdate(LabelChangingDto labelChangingDto, @MappingTarget Label label);
 }
