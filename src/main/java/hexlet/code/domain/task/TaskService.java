@@ -1,16 +1,19 @@
 package hexlet.code.domain.task;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public interface TaskService {
-    List<Task> findAll();
+    List<Task> findAll(Optional<Long> taskStatusId, Optional<Long> executorId,
+                       Optional<Long> labelsId, Optional<Long> authorId);
 
     Task findById(Long id);
 
     Task save(Task newTask);
 
-    Task createTask(Task newTask, long taskStatusId, long authorId, long executorId, Set<Long> labelIds);
+    Task createTask(Task newTask, Optional<Long> taskStatusId, Optional<Long> authorId,
+                    Optional<Long> executorId, Optional<Set<Long>> labelIds);
 
     Task updateTask(Task taskToUpdate, long taskStatusId, long authorId, long executorId, Set<Long> labelIds, long id);
 

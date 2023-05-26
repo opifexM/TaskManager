@@ -8,9 +8,11 @@ import hexlet.code.exception.DuplicateTaskException;
 import hexlet.code.exception.TaskNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -24,10 +26,42 @@ public class TaskServiceImpl implements TaskService {
     private final UserService userService;
     private final LabelService labelService;
 
+    // todo
+    // @Override
+    // public List<Task> findAll(Optional<Long> taskStatusId, Optional<Long> executorId,
+    //                           Optional<Long> labelsId, Optional<Long> authorId) {
+    //     log.info("Received filter parameters: taskStatusId={}, executorId={}, labelsId={}, authorId={}",
+    //             taskStatusId, executorId, labelsId, authorId);
+    //
+    //     QTask task = QTask.task;
+    //     BooleanBuilder where = new BooleanBuilder();
+    //     taskStatusId.ifPresent(id -> where.and(task.taskStatus.id.eq(id)));
+    //     executorId.ifPresent(id -> where.and(task.executor.id.eq(id)));
+    //     authorId.ifPresent(id -> where.and(task.author.id.eq(id)));
+    //     labelsId.ifPresent(id -> where.and(task.labels.any().id.eq(id)));
+    //
+    //     log.info("Constructed filter condition: {}", where.toString());
+    //     List<Task> tasks = (List<Task>) taskRepository.findAll(where);
+    //
+    //     log.info("Found {} tasks with the provided filter parameters", tasks.size());
+    //     return tasks;
+    // }
+
     @Override
-    public List<Task> findAll() {
-        log.info("Retrieving all tasks");
-        return taskRepository.findAll();
+    public List<Task> findAll(Optional<Long> taskStatusId, Optional<Long> executorId,
+                              Optional<Long> labelsId, Optional<Long> authorId) {
+        log.info("Received filter parameters: taskStatusId={}, executorId={}, labelsId={}, authorId={}",
+                taskStatusId, executorId, labelsId, authorId);
+
+        List<Task> tasks = taskRepository.findAll(
+                Specification.where(taskStatusId.map(TaskSpecifications::hasTaskStatus).orElse(null))
+                        .and(executorId.map(TaskSpecifications::hasExecutor).orElse(null))
+                        .and(labelsId.map(TaskSpecifications::hasLabel).orElse(null))
+                        .and(authorId.map(TaskSpecifications::hasAuthor).orElse(null))
+        );
+
+        log.info("Found {} tasks with the provided filter parameters.", tasks);
+        return tasks;
     }
 
     @Override
@@ -55,16 +89,17 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Task createTask(Task newTask, long taskStatusId, long authorId, long executorId, Set<Long> labelIds) {
-        newTask.setTaskStatus(statusService.findById(taskStatusId));
-        newTask.setAuthor(userService.findById(authorId));
-        if (executorId > 0) {
-            newTask.setExecutor(userService.findById(executorId));
-        }
-        Set<Label> labelSet = labelIds.stream()
-                .map(labelService::findById)
-                .collect(Collectors.toSet());
-        newTask.setLabels(labelSet);
+    public Task createTask(Task newTask, Optional<Long> taskStatusId, Optional<Long> authorId,
+                           Optional<Long> executorId, Optional<Set<Long>> labelIds) {
+        taskStatusId.ifPresent(id -> newTask.setTaskStatus(statusService.findById(id)));
+        authorId.ifPresent(id -> newTask.setAuthor(userService.findById(id)));
+        executorId.ifPresent(id -> newTask.setExecutor(userService.findById(id)));
+        labelIds.ifPresent(ids -> {
+            Set<Label> labelSet = ids.stream()
+                    .map(labelService::findById)
+                    .collect(Collectors.toSet());
+            newTask.setLabels(labelSet);
+        });
         return save(newTask);
     }
 

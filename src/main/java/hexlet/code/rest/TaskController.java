@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -43,9 +44,21 @@ public class TaskController {
     @GetMapping("")
     @Operation(summary = "List all tasks", description = "Retrieves all tasks")
     @Transactional
-    public List<TaskDto> listAllTasks() {
+    public List<TaskDto> listAllTasks(
+            @RequestParam(required = false) @Parameter(description = "Task Status ID") Long taskStatus,
+            @RequestParam(required = false) @Parameter(description = "Executor ID") Long executorId,
+            @RequestParam(required = false) @Parameter(description = "Label ID") Long labelsId,
+            @RequestParam(required = false) @Parameter(description = "Author ID") Long authorId
+    ) {
         log.info("Listing all tasks");
-        return taskService.findAll().stream().map(taskMapper::toDto).toList();
+        return taskService.findAll(
+                        Optional.ofNullable(taskStatus),
+                        Optional.ofNullable(executorId),
+                        Optional.ofNullable(labelsId),
+                        Optional.ofNullable(authorId))
+                .stream()
+                .map(taskMapper::toDto)
+                .toList();
     }
 
     @GetMapping("/{id}")
@@ -63,12 +76,11 @@ public class TaskController {
         log.info("Creating a new task: {}", taskCreationDto);
 
         Task taskToCreate = taskMapper.toEntity(taskCreationDto);
-        long taskStatusId = Optional.of(taskCreationDto.getTaskStatusId()).orElse(0L);
-        //todo
-        long authorId = Optional.ofNullable(taskCreationDto.getAuthorId()).orElse(202L);
-        long executorId = Optional.ofNullable(taskCreationDto.getExecutorId()).orElse(0L);
-        Set<Long> labelIds = Optional.ofNullable(taskCreationDto.getLabelIds()).orElse(new HashSet<>());
-
+        Optional<Long> taskStatusId = Optional.ofNullable(taskCreationDto.getTaskStatusId());
+        // todo authorId
+        Optional<Long> authorId = Optional.ofNullable(taskCreationDto.getAuthorId()).orElse(202L).describeConstable();
+        Optional<Long> executorId = Optional.ofNullable(taskCreationDto.getExecutorId());
+        Optional<Set<Long>> labelIds = Optional.ofNullable(taskCreationDto.getLabelIds());
         Task savedTask = taskService.createTask(taskToCreate, taskStatusId, authorId, executorId, labelIds);
         return taskMapper.toDto(savedTask);
     }
@@ -82,7 +94,7 @@ public class TaskController {
 
         Task taskToUpdate = taskMapper.toEntity(taskChangingDto);
         long taskStatusId = Optional.of(taskChangingDto.getTaskStatusId()).orElse(0L);
-        //todo
+        // todo
         long authorId = Optional.ofNullable(taskChangingDto.getAuthorId()).orElse(202L);
         long executorId = Optional.ofNullable(taskChangingDto.getExecutorId()).orElse(0L);
         Set<Long> labelIds = Optional.ofNullable(taskChangingDto.getLabelIds()).orElse(new HashSet<>());

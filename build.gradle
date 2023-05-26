@@ -50,6 +50,12 @@ dependencies {
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0'
     implementation 'org.hibernate.validator:hibernate-validator'
 
+//    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+//    compileOnly 'com.querydsl:querydsl-apt:5.0.0:jpa'
+//    annotationProcessor 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+//    implementation 'javax.persistence:javax.persistence-api:2.2'
+
+
     testImplementation 'org.glassfish:jakarta.el:5.0.0-M1'
 
     implementation 'org.mapstruct:mapstruct:1.5.5.Final'
@@ -65,11 +71,22 @@ dependencies {
     testImplementation 'org.testcontainers:junit-jupiter'
 }
 
+//compileJava {
+//    options.annotationProcessorPath = configurations.annotationProcessor
+//}
+
+
 dependencyManagement {
     imports {
         mavenBom "org.testcontainers:testcontainers-bom:${testcontainersVersion}"
     }
 }
+
+//compileJava {
+//    options.compilerArgs = [
+//            '-processor', 'com.querydsl.apt.jpa.JPAAnnotationProcessor'
+//    ]
+//}
 
 tasks.named('test') {
     useJUnitPlatform()
