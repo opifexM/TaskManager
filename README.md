@@ -11,7 +11,9 @@ Swagger: https://taskm.herokuapp.com/swagger-ui/index.html
 
 ## Overview
 
-This project is a Spring Boot web application that provides APIs for managing various resources: Labels, Statuses, Tasks, and Users. It is implemented using Java 17, Spring Boot 3, and other supporting libraries such as Hibernate Validator, SpringDoc OpenAPI, and MapStruct.
+This project is a Spring Boot web application that provides APIs for managing various resources: Labels, Statuses, Tasks, and Users.
+It is implemented Spring Security 6 with JWT authentication, ensuring robust security standards and Argon2 for password encoding 
+and uses a stack of advanced technologies such as Liquibase, Testcontainers, PostgreSQL, and MapStruct for efficient and reliable database management and object mapping.
 
 ## Dependencies
 
@@ -64,4 +66,3 @@ The application exposes the following RESTful APIs:
 -   **POST /users**: Create a new user
 -   **PUT /users/{id}**: Update a user by ID
 -   **DELETE /users/{id}**: Delete a user by ID
-
