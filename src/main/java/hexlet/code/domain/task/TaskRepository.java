@@ -8,7 +8,7 @@ import java.util.Optional;
 
 @Repository
 //todo
-// public interface TaskRepository extends JpaRepository<Task, Long>, QuerydslPredicateExecutor<Task> {
+//public interface TaskRepository extends JpaRepository<Task, Long>, QuerydslPredicateExecutor<Task> {
 public interface TaskRepository extends JpaRepository<Task, Long>, JpaSpecificationExecutor<Task> {
     Optional<Task> findByName(String name);
 
