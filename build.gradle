@@ -55,6 +55,8 @@ dependencies {
 //    annotationProcessor 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
 //    implementation 'javax.persistence:javax.persistence-api:2.2'
 
+    implementation 'com.rollbar:rollbar-spring-boot3-webmvc:1.10.0'
+
 
     testImplementation 'org.glassfish:jakarta.el:5.0.0-M1'
 

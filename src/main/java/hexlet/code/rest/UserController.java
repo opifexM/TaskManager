@@ -1,5 +1,6 @@
 package hexlet.code.rest;
 
+import com.rollbar.notifier.Rollbar;
 import hexlet.code.domain.user.User;
 import hexlet.code.domain.user.UserChangingDto;
 import hexlet.code.domain.user.UserCreationDto;
@@ -33,6 +34,8 @@ public class UserController {
     private final UserMapper userMapper;
 
     private final UserService userService;
+
+    private final Rollbar rollbar;
 
     @GetMapping("")
     @Operation(summary = "List all users", description = "Retrieves all users")

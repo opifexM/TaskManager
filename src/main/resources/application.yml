@@ -7,6 +7,9 @@ jwt:
   secret: SecretKeySecretKeySecretKeySecretKeySecretKeySecretKeySecretKeySecretKeySecretKeySecretKeySecretKey
   expiration: 3600000
 
+rollbar:
+  token: 6b44f0336d5c49be901d487c25dfb320
+
 logging:
   level:
     root: INFO

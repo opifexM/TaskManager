@@ -30,6 +30,7 @@ The project uses various dependencies managed by Gradle. Key dependencies includ
 -   MapStruct for object mapping
 -   Lombok for reducing boilerplate code
 -   Testcontainers for integration testing
+-   Rollbar error tracking
 
 ## APIs
 
