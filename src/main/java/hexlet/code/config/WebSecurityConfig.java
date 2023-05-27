@@ -21,7 +21,6 @@ import org.springframework.security.web.util.matcher.RequestMatchers;
 
 @Configuration
 @EnableWebSecurity
-// Determines if Spring Security's PreAuthorize, PostAuthorize, PreFilter, and PostFilter annotations should be enabled. Default is true.
 @EnableMethodSecurity()
 @Slf4j
 public class WebSecurityConfig {
@@ -47,8 +46,6 @@ public class WebSecurityConfig {
     public SecurityFilterChain filterChain(final HttpSecurity http,
                                            final JWTAuthenticationFilter jwtAuthenticationFilter,
                                            final JwtAuthorizationFilter jwtAuthorizationFilter) throws Exception {
-
-
         log.info("config http security");
         http
                 .csrf(AbstractHttpConfigurer::disable)
@@ -63,19 +60,12 @@ public class WebSecurityConfig {
                                         RequestMatchers.not(new AntPathRequestMatcher(baseUrl + "/**"))
                                 ).permitAll()
                                 // todo
-                                .requestMatchers("/**").permitAll()
+                                // .requestMatchers("/**").permitAll()
                                 .anyRequest().authenticated()
                 )
 
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthorizationFilter, JWTAuthenticationFilter.class)
-        // .formLogin(formLogin -> formLogin
-        //         .usernameParameter("username")
-        //         .passwordParameter("password")
-        //         .loginPage("/authentication/login")
-        //         .failureUrl("/authentication/login?failed")
-        //         .loginProcessingUrl(baseUrl + "/api/login")
-        // )
         ;
         return http.build();
     }
