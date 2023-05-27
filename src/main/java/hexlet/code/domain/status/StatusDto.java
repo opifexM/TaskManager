@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * DTO for {@link Status}
+ * DTO for {@link Status}.
  */
 @Data
 @AllArgsConstructor

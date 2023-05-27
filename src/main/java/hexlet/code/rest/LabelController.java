@@ -62,8 +62,10 @@ public class LabelController {
     @PutMapping("/{id}")
     @Operation(summary = "Update label by ID", description = "Updates label information by ID")
     public LabelDto updateLabel(
-            @Valid @RequestBody @Parameter(description = "Updated label object") final LabelChangingDto labelChangingDto,
-            @PathVariable("id") @Parameter(description = "Label ID") final long id) {
+            @Valid @RequestBody
+            @Parameter(description = "Updated label object") final LabelChangingDto labelChangingDto,
+            @PathVariable("id")
+            @Parameter(description = "Label ID") final long id) {
         log.info("Updating label with ID: {} with data: {}", id, labelChangingDto);
         Label labelToUpdate = labelMapper.toEntity(labelChangingDto);
         Label updatedLabel = labelService.updateById(labelToUpdate, id);

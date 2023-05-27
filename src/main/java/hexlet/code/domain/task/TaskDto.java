@@ -13,7 +13,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * DTO for {@link Task}
+ * DTO for {@link Task}.
  */
 @Data
 @AllArgsConstructor

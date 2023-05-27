@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 
 /**
- * DTO for {@link Status}
+ * DTO for {@link Status}.
  */
 @Data
 @AllArgsConstructor

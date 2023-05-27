@@ -39,7 +39,8 @@ public class StatusServiceImpl implements StatusService {
     public Status save(Status newStatus) {
         log.info("Saving new status: {}", newStatus);
         if (statusRepository.findByName(newStatus.getName()).isPresent()) {
-            String message = String.format("Failed to save status. Status with name '%s' already exists.", newStatus.getName());
+            String message = String.format("Failed to save status. Status with name '%s' already exists.",
+                    newStatus.getName());
             log.error(message);
             throw new DuplicateStatusException(message);
         }

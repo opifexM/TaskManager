@@ -11,7 +11,7 @@ import java.io.Serializable;
 import java.util.Set;
 
 /**
- * DTO for {@link Task}
+ * DTO for {@link Task}.
  */
 @Data
 @AllArgsConstructor

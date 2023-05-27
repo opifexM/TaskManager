@@ -79,7 +79,8 @@ public class TaskServiceImpl implements TaskService {
     public Task save(Task newTask) {
         log.info("Saving new task: {}", newTask);
         if (taskRepository.findByName(newTask.getName()).isPresent()) {
-            String message = String.format("Failed to save task. Task with name '%s' already exists.", newTask.getName());
+            String message = String.format("Failed to save task. Task with name '%s' already exists.",
+                    newTask.getName());
             log.error(message);
             throw new DuplicateTaskException(message);
         }

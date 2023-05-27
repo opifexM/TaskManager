@@ -62,8 +62,10 @@ public class StatusController {
     @PutMapping("/{id}")
     @Operation(summary = "Update status by ID", description = "Updates status information by ID")
     public StatusDto updateStatus(
-            @Valid @RequestBody @Parameter(description = "Updated status object") final StatusChangingDto statusChangingDto,
-            @PathVariable("id") @Parameter(description = "Status ID") final long id) {
+            @Valid @RequestBody
+            @Parameter(description = "Updated status object") final StatusChangingDto statusChangingDto,
+            @PathVariable("id")
+            @Parameter(description = "Status ID") final long id) {
         log.info("Updating status with ID: {} with data: {}", id, statusChangingDto);
         Status statusToUpdate = statusMapper.toEntity(statusChangingDto);
         Status updatedStatus = statusService.updateById(statusToUpdate, id);

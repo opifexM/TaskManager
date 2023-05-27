@@ -1,0 +1,56 @@
+{
+  "users": {
+    "new": {
+      "firstName": "Malika",
+      "lastName": "Hodkiewicz",
+      "email": "malika_hodkiewicz75@live.com",
+      "password": "RLJvaIgPOnX5r03"
+    },
+    "existing": {
+      "firstName": "Lawrence",
+      "lastName": "Kulas",
+      "email": "lawrence.kulas87@outlook.com",
+      "password": "XXs8HMdxYWdQj4m"
+    }
+  },
+  "statuses": {
+    "new": {
+      "name": "new status name"
+    },
+    "existing": {
+      "name": "second status name"
+    }
+  },
+  "labels": {
+    "new": {
+      "name": "new label name"
+    },
+    "existing": {
+      "name": "second label name"
+    }
+  },
+  "tasks": {
+    "first": {
+      "name": "first task name",
+      "description": "first task description",
+      "statusName": "first status name",
+      "executorEmail": "elbert_abshire52@gmail.com",
+      "label1Name": "first label name",
+      "label2Name": "third label name"
+    },
+    "second": {
+      "name": "second task name",
+      "description": "second task description",
+      "statusName": "second status name",
+      "executorEmail": "lawrence.kulas87@outlook.com",
+      "label1Name": "first label name",
+      "label2Name": "second label name"
+    },
+    "third": {
+      "name": "third task name",
+      "description": "third task description",
+      "statusName": "second status name",
+      "executorEmail": "nona_murray@yahoo.com"
+    }
+  }
+}

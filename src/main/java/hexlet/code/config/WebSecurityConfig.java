@@ -38,7 +38,8 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(final AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    public AuthenticationManager authenticationManager(final AuthenticationConfiguration authenticationConfiguration)
+            throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
@@ -53,9 +54,12 @@ public class WebSecurityConfig {
                         authorize -> authorize
                                 .requestMatchers(
                                         RequestMatchers.anyOf(
-                                                new AntPathRequestMatcher(baseUrl + "/users", HttpMethod.POST.toString()),
-                                                new AntPathRequestMatcher(baseUrl + "/users", HttpMethod.GET.toString()),
-                                                new AntPathRequestMatcher(baseUrl + "/login", HttpMethod.POST.toString())
+                                                new AntPathRequestMatcher(baseUrl + "/users",
+                                                        HttpMethod.POST.toString()),
+                                                new AntPathRequestMatcher(baseUrl + "/users",
+                                                        HttpMethod.GET.toString()),
+                                                new AntPathRequestMatcher(baseUrl + "/login",
+                                                        HttpMethod.POST.toString())
                                         ),
                                         RequestMatchers.not(new AntPathRequestMatcher(baseUrl + "/**"))
                                 ).permitAll()
@@ -63,10 +67,8 @@ public class WebSecurityConfig {
                                 // .requestMatchers("/**").permitAll()
                                 .anyRequest().authenticated()
                 )
-
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(jwtAuthorizationFilter, JWTAuthenticationFilter.class)
-        ;
+                .addFilterBefore(jwtAuthorizationFilter, JWTAuthenticationFilter.class);
         return http.build();
     }
 }

@@ -44,7 +44,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public User save(final User newUser) {
         log.info("Saving new user: {}", newUser);
         if (userRepository.findByEmail(newUser.getEmail()).isPresent()) {
-            String message = String.format("Failed to save user. User with email '%s' already exists.", newUser.getEmail());
+            String message = String.format("Failed to save user. User with email '%s' already exists.",
+                    newUser.getEmail());
             log.error(message);
             throw new DuplicateUserException(message);
         }

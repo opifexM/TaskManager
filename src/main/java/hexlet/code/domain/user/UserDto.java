@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * A DTO for the {@link User} entity
+ * A DTO for the {@link User} entity.
  */
 @Data
 @AllArgsConstructor

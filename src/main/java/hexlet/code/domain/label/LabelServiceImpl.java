@@ -39,7 +39,8 @@ public class LabelServiceImpl implements LabelService {
     public Label save(Label newLabel) {
         log.info("Saving new label: {}", newLabel);
         if (labelRepository.findByName(newLabel.getName()).isPresent()) {
-            String message = String.format("Failed to save label. Label with name '%s' already exists.", newLabel.getName());
+            String message = String.format("Failed to save label. Label with name '%s' already exists.",
+                    newLabel.getName());
             log.error(message);
             throw new DuplicateLabelException(message);
         }

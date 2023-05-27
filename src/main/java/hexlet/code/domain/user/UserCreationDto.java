@@ -11,7 +11,7 @@ import lombok.ToString;
 import java.io.Serializable;
 
 /**
- * DTO for {@link User}
+ * DTO for {@link User}.
  */
 @Data
 @AllArgsConstructor

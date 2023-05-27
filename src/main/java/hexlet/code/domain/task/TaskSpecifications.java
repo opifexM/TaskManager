@@ -4,7 +4,7 @@ import hexlet.code.domain.label.Label;
 import jakarta.persistence.criteria.Join;
 import org.springframework.data.jpa.domain.Specification;
 
-public class TaskSpecifications {
+public final class TaskSpecifications {
     private TaskSpecifications() {
     }
 
