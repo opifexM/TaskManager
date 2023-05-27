@@ -26,7 +26,7 @@ public class TaskServiceImpl implements TaskService {
     private final UserService userService;
     private final LabelService labelService;
 
-    // todo
+    // todo Querydsl
     // @Override
     // public List<Task> findAll(Optional<Long> taskStatusId, Optional<Long> executorId,
     //                           Optional<Long> labelsId, Optional<Long> authorId) {
@@ -52,7 +52,6 @@ public class TaskServiceImpl implements TaskService {
                               Optional<Long> labelsId, Optional<Long> authorId) {
         log.info("Received filter parameters: taskStatusId={}, executorId={}, labelsId={}, authorId={}",
                 taskStatusId, executorId, labelsId, authorId);
-
         List<Task> tasks = taskRepository.findAll(
                 Specification.where(taskStatusId.map(TaskSpecifications::hasTaskStatus).orElse(null))
                         .and(executorId.map(TaskSpecifications::hasExecutor).orElse(null))
@@ -90,10 +89,12 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Task createTask(Task newTask, Optional<Long> taskStatusId, Optional<Long> authorId,
+    public Task createTask(Task newTask, Optional<Long> taskStatusId,
                            Optional<Long> executorId, Optional<Set<Long>> labelIds) {
+
+        long currentUserNameId = userService.getCurrentUserNameId();
+        newTask.setAuthor(userService.findById(currentUserNameId));
         taskStatusId.ifPresent(id -> newTask.setTaskStatus(statusService.findById(id)));
-        authorId.ifPresent(id -> newTask.setAuthor(userService.findById(id)));
         executorId.ifPresent(id -> newTask.setExecutor(userService.findById(id)));
         labelIds.ifPresent(ids -> {
             Set<Label> labelSet = ids.stream()
@@ -105,10 +106,12 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Task updateTask(Task taskToUpdate, long taskStatusId, long authorId,
+    public Task updateTask(Task taskToUpdate, long taskStatusId,
                            long executorId, Set<Long> labelIds, long id) {
+
+        long currentUserNameId = userService.getCurrentUserNameId();
+        taskToUpdate.setAuthor(userService.findById(currentUserNameId));
         taskToUpdate.setTaskStatus(statusService.findById(taskStatusId));
-        taskToUpdate.setAuthor(userService.findById(authorId));
         if (executorId > 0) {
             taskToUpdate.setExecutor(userService.findById(executorId));
         }

@@ -36,7 +36,7 @@ import hexlet.project.utils.TestUtils;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 @Transactional
-public class UserTest {
+class UserTest {
 
     private static ObjectMapper mapper = new ObjectMapper();
     private static Map<String, Map> testData;

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+@SuppressWarnings("unused")
 @Repository
 public interface LabelRepository extends JpaRepository<Label, Long> {
     Optional<Label> findByName(String name);

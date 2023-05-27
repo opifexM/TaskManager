@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+@SuppressWarnings("unused")
 @Service
 @RequiredArgsConstructor
 public class UserSecurityService {

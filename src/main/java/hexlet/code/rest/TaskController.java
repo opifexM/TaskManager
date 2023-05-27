@@ -76,12 +76,11 @@ public class TaskController {
         log.info("Creating a new task: {}", taskCreationDto);
 
         Task taskToCreate = taskMapper.toEntity(taskCreationDto);
+        @SuppressWarnings("DataFlowIssue")
         Optional<Long> taskStatusId = Optional.ofNullable(taskCreationDto.getTaskStatusId());
-        // todo authorId
-        Optional<Long> authorId = Optional.ofNullable(taskCreationDto.getAuthorId()).orElse(202L).describeConstable();
         Optional<Long> executorId = Optional.ofNullable(taskCreationDto.getExecutorId());
         Optional<Set<Long>> labelIds = Optional.ofNullable(taskCreationDto.getLabelIds());
-        Task savedTask = taskService.createTask(taskToCreate, taskStatusId, authorId, executorId, labelIds);
+        Task savedTask = taskService.createTask(taskToCreate, taskStatusId, executorId, labelIds);
         return taskMapper.toDto(savedTask);
     }
 
@@ -94,12 +93,10 @@ public class TaskController {
 
         Task taskToUpdate = taskMapper.toEntity(taskChangingDto);
         long taskStatusId = Optional.of(taskChangingDto.getTaskStatusId()).orElse(0L);
-        // todo
-        long authorId = Optional.ofNullable(taskChangingDto.getAuthorId()).orElse(202L);
         long executorId = Optional.ofNullable(taskChangingDto.getExecutorId()).orElse(0L);
         Set<Long> labelIds = Optional.ofNullable(taskChangingDto.getLabelIds()).orElse(new HashSet<>());
 
-        Task updatedTask = taskService.updateTask(taskToUpdate, taskStatusId, authorId, executorId, labelIds, id);
+        Task updatedTask = taskService.updateTask(taskToUpdate, taskStatusId, executorId, labelIds, id);
         return taskMapper.toDto(updatedTask);
     }
 

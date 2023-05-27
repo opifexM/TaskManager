@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+@SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "unused"})
 public interface TaskService {
     List<Task> findAll(Optional<Long> taskStatusId, Optional<Long> executorId,
                        Optional<Long> labelsId, Optional<Long> authorId);
@@ -12,10 +13,10 @@ public interface TaskService {
 
     Task save(Task newTask);
 
-    Task createTask(Task newTask, Optional<Long> taskStatusId, Optional<Long> authorId,
+    Task createTask(Task newTask, Optional<Long> taskStatusId,
                     Optional<Long> executorId, Optional<Set<Long>> labelIds);
 
-    Task updateTask(Task taskToUpdate, long taskStatusId, long authorId, long executorId, Set<Long> labelIds, long id);
+    Task updateTask(Task taskToUpdate, long taskStatusId, long executorId, Set<Long> labelIds, long id);
 
     Task updateById(Task updatedTask, long id);
 

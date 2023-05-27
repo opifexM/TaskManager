@@ -7,6 +7,7 @@ import hexlet.code.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -95,12 +96,24 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
+    public long getCurrentUserNameId() {
+        String userLogin = SecurityContextHolder.getContext().getAuthentication().getName();
+        User currentUser = userRepository.findByEmail(userLogin)
+                .orElseThrow(() -> {
+                    String message = String.format("Failed to load user ID. User with email '%s' not found.", userLogin);
+                    log.error(message);
+                    return new UserNotFoundException(message);
+                });
+        return currentUser.getId();
+    }
+
+    @Override
     public UserDetails loadUserByUsername(final String email) throws UsernameNotFoundException {
-        log.info("Attempting to load user by email: {}", email);
+        log.info("Attempting to load User Details by email: {}", email);
         return userRepository.findByEmail(email)
                 .map(this::toSpringUser)
                 .orElseThrow(() -> {
-                    String message = String.format("Failed to load user. User with email '%s' not found.", email);
+                    String message = String.format("Failed to load User Details. User with email '%s' not found.", email);
                     log.error(message);
                     return new UserNotFoundException(message);
                 });
@@ -112,4 +125,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 user.getPassword(),
                 List.of(new SimpleGrantedAuthority("USER")));
     }
+
+
 }
