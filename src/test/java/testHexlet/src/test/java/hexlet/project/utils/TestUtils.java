@@ -1,4 +1,4 @@
-package test;
+package testHexlet.src.test.java.hexlet.project.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.test.web.servlet.MockMvc;
@@ -21,9 +21,10 @@ public class TestUtils {
     private static final String BEARER = "Bearer ";
 
     private static Path getFixturePath(String fileName) {
-        return Paths.get("src", "test", "resources", "fixtures", fileName)
+        return Paths.get("src", "test", "java", "testHexlet", "src", "test", "resources", "fixtures", fileName)
             .toAbsolutePath().normalize();
     }
+
 
     private static String readFixture(String fileName) throws Exception {
         Path filePath = getFixturePath(fileName);

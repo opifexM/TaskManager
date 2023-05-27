@@ -56,6 +56,11 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                                 HttpServletResponse response) throws AuthenticationException {
         try {
             User credentials = new ObjectMapper().readValue(request.getInputStream(), User.class);
+            if (credentials.getEmail() == null || credentials.getEmail().isEmpty()
+                    || credentials.getPassword() == null || credentials.getPassword().isEmpty()) {
+                throw new AuthenticationServiceException("Username or password is missing");
+            }
+
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                     credentials.getEmail(), credentials.getPassword(), Collections.emptyList());
             Authentication authentication = getAuthenticationManager().authenticate(authToken);
