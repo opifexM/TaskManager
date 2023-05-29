@@ -39,9 +39,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
-// import static org.junit.jupiter.api.Assertions.assertEquals;
-// import static org.junit.jupiter.api.Assertions.assertFalse;
-// import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -102,13 +100,13 @@ class UserControllerTest {
     }
 
     private void registerTestUser() {
-        String userJson = jsonRead("fixtures/newUser.json");
+        String userJson = jsonRead("fixtures/userForRegistration.json");
         ResponseEntity<String> response = registerUser(userJson, BASE_URL + port + API_USERS);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     }
 
     private HttpEntity<String> loginTestUser() {
-        String userJson = jsonRead("fixtures/login.json");
+        String userJson = jsonRead("fixtures/userForLogin.json");
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> request = new HttpEntity<>(userJson, headers);
@@ -145,12 +143,14 @@ class UserControllerTest {
         UserDto user = response.getBody();
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(user).isNotNull();
-
-        assertThat(user.getId()).isEqualTo(1L);
-        assertThat(user.getFirstName()).isEqualTo("John");
-        assertThat(user.getLastName()).isEqualTo("Doe");
-        assertThat(user.getEmail()).isEqualTo("john.doe@example.com");
+        assertThat(user)
+                .isNotNull()
+                .satisfies(u -> {
+                    assertThat(u.getId()).isEqualTo(1L);
+                    assertThat(u.getFirstName()).isEqualTo("John");
+                    assertThat(u.getLastName()).isEqualTo("Doe");
+                    assertThat(u.getEmail()).isEqualTo("john.doe@example.com");
+                });
     }
 
     @Test
@@ -168,26 +168,23 @@ class UserControllerTest {
         List<UserDto> userDtoList = response.getBody();
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(userDtoList).isNotNull();
-        assertThat(userDtoList).isNotEmpty();
-
-        UserDto user = userDtoList.get(0);
-        assertThat(user.getId()).isEqualTo(1);
-        assertThat(user.getFirstName()).isEqualTo("Ivan");
-        assertThat(user.getLastName()).isEqualTo("Petrov");
-        assertThat(user.getEmail()).isEqualTo("ivan@google.com");
-
-        user = userDtoList.get(1);
-        assertThat(user.getId()).isEqualTo(2);
-        assertThat(user.getFirstName()).isEqualTo("Petr");
-        assertThat(user.getLastName()).isEqualTo("Sidorov");
-        assertThat(user.getEmail()).isEqualTo("petr@yahoo.com");
+        assertThat(userDtoList)
+                .isNotNull()
+                .isNotEmpty()
+                .extracting(UserDto::getId,
+                        UserDto::getFirstName,
+                        UserDto::getLastName,
+                        UserDto::getEmail)
+                .contains(
+                        tuple(1L, "Ivan", "Petrov", "ivan@google.com"),
+                        tuple(2L, "Petr", "Sidorov", "petr@yahoo.com")
+                );
     }
 
     @SneakyThrows
     private void registerUserList() {
         List<User> userListForRegistration = OBJECT_MAPPER.readValue(
-                jsonRead("fixtures/usersForRegistration.json"),
+                jsonRead("fixtures/userListForRegistration.json"),
                 new TypeReference<>() {
                 });
 
@@ -201,9 +198,9 @@ class UserControllerTest {
     @ParameterizedTest
     @Transactional
     @ValueSource(strings = {
-            "fixtures/invalidNewUser1.json",
-            "fixtures/invalidNewUser2.json",
-            "fixtures/invalidNewUser3.json"
+            "fixtures/userWithInvalidEmail.json",
+            "fixtures/userWithMissingFirstName.json",
+            "fixtures/userWithInvalidPassword.json"
     })
     void shouldReturnBadRequestWhenInvalidUserDataProvided(String jsonFilePath) {
         String userJson = jsonRead(jsonFilePath);
@@ -225,21 +222,27 @@ class UserControllerTest {
         ResponseEntity<UserDto> response = restTemplate.exchange(url, HttpMethod.GET, requestWithJWTToken, UserDto.class);
         UserDto user = response.getBody();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(user).isNotNull();
-        assertThat(user.getId()).isEqualTo(1L);
-        assertThat(user.getFirstName()).isEqualTo("John");
-        assertThat(user.getLastName()).isEqualTo("Doe");
-        assertThat(user.getEmail()).isEqualTo("john.doe@example.com");
+        assertThat(user)
+                .isNotNull()
+                .satisfies(u -> {
+                    assertThat(u.getId()).isEqualTo(1L);
+                    assertThat(u.getFirstName()).isEqualTo("John");
+                    assertThat(u.getLastName()).isEqualTo("Doe");
+                    assertThat(u.getEmail()).isEqualTo("john.doe@example.com");
+                });
 
-        String userForUpdate = jsonRead("fixtures/newUserForUpdate.json");
+        String userForUpdate = jsonRead("fixtures/userForUpdate.json");
         HttpEntity<String> requestWithBodyAndToken = new HttpEntity<>(userForUpdate, requestWithJWTToken.getHeaders());
         response = restTemplate.exchange(url, HttpMethod.PUT, requestWithBodyAndToken, UserDto.class);
         UserDto updatedUser = response.getBody();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(user).isNotNull();
-        assertThat(updatedUser.getFirstName()).isEqualTo("Mike");
-        assertThat(updatedUser.getLastName()).isEqualTo("Whisky");
-        assertThat(updatedUser.getEmail()).isEqualTo("mike.whisky@example.com");
+        assertThat(updatedUser)
+                .isNotNull()
+                .satisfies(u -> {
+                    assertThat(u.getFirstName()).isEqualTo("Mike");
+                    assertThat(u.getLastName()).isEqualTo("Whisky");
+                    assertThat(u.getEmail()).isEqualTo("mike.whisky@example.com");
+                });
     }
 
     @Test
@@ -254,9 +257,11 @@ class UserControllerTest {
                 .toUriString();
 
         ResponseEntity<UserDto> response = restTemplate.exchange(url, HttpMethod.GET, requestWithJWTToken, UserDto.class);
-        UserDto user = response.getBody();
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(user).isNotNull();
+        assertThat(response)
+                .satisfies(r -> {
+                    assertThat(r.getStatusCode()).isEqualTo(HttpStatus.OK);
+                    assertThat(r.getBody()).isNotNull();
+                });
 
         response = restTemplate.exchange(url, HttpMethod.DELETE, requestWithJWTToken, UserDto.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
