@@ -37,14 +37,14 @@ public class LabelController {
 
     @GetMapping("")
     @Operation(summary = "List all labels", description = "Retrieves all labels")
-    public List<LabelDto> listAllLabels() {
+    public List<LabelDto> getAllLabels() {
         log.info("Listing all labels");
         return labelService.findAll().stream().map(labelMapper::toDto).toList();
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Get label by ID", description = "Retrieves a label by ID")
-    public LabelDto getLabelById(@PathVariable("id") @Parameter(description = "Label ID") final long id) {
+    public LabelDto getLabel(@PathVariable("id") @Parameter(description = "Label ID") final long id) {
         log.info("Getting label with ID: {}", id);
         return labelMapper.toDto(labelService.findById(id));
     }

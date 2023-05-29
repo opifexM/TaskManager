@@ -13,8 +13,8 @@ public interface TaskService {
 
     Task save(Task newTask);
 
-    Task createTask(Task newTask, Optional<Long> taskStatusId,
-                    Optional<Long> executorId, Optional<Set<Long>> labelIds);
+    Task configureAndSaveTask(Task newTask, Optional<Long> taskStatusId,
+                              Optional<Long> executorId, Optional<Set<Long>> labelIds);
 
     Task updateTask(Task taskToUpdate, long taskStatusId, long executorId, Set<Long> labelIds, long id);
 

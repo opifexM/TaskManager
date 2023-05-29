@@ -44,7 +44,7 @@ public class TaskController {
     @GetMapping("")
     @Operation(summary = "List all tasks", description = "Retrieves all tasks")
     @Transactional
-    public List<TaskDto> listAllTasks(
+    public List<TaskDto> getAllTasks(
             @RequestParam(required = false) @Parameter(description = "Task Status ID") Long taskStatus,
             @RequestParam(required = false) @Parameter(description = "Executor ID") Long executorId,
             @RequestParam(required = false) @Parameter(description = "Label ID") Long labelsId,
@@ -64,7 +64,7 @@ public class TaskController {
     @GetMapping("/{id}")
     @Operation(summary = "Get task by ID", description = "Retrieves a task by ID")
     @Transactional
-    public TaskDto getTaskById(@PathVariable("id") @Parameter(description = "Task ID") final long id) {
+    public TaskDto getTask(@PathVariable("id") @Parameter(description = "Task ID") final long id) {
         log.info("Getting task with ID: {}", id);
         return taskMapper.toDto(taskService.findById(id));
     }
@@ -80,7 +80,7 @@ public class TaskController {
         Optional<Long> taskStatusId = Optional.ofNullable(taskCreationDto.getTaskStatusId());
         Optional<Long> executorId = Optional.ofNullable(taskCreationDto.getExecutorId());
         Optional<Set<Long>> labelIds = Optional.ofNullable(taskCreationDto.getLabelIds());
-        Task savedTask = taskService.createTask(taskToCreate, taskStatusId, executorId, labelIds);
+        Task savedTask = taskService.configureAndSaveTask(taskToCreate, taskStatusId, executorId, labelIds);
         return taskMapper.toDto(savedTask);
     }
 

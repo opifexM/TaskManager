@@ -89,8 +89,8 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Task createTask(Task newTask, Optional<Long> taskStatusId,
-                           Optional<Long> executorId, Optional<Set<Long>> labelIds) {
+    public Task configureAndSaveTask(Task newTask, Optional<Long> taskStatusId,
+                                     Optional<Long> executorId, Optional<Set<Long>> labelIds) {
 
         long currentUserNameId = userService.getCurrentUserNameId();
         newTask.setAuthor(userService.findById(currentUserNameId));

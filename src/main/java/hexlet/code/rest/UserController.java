@@ -41,14 +41,14 @@ public class UserController {
 
     @GetMapping("")
     @Operation(summary = "List all users", description = "Retrieves all users")
-    public List<UserDto> listAllUsers() {
+    public List<UserDto> getAllUsers() {
         log.info("Listing all users");
         return userService.findAll().stream().map(userMapper::toDto).toList();
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Get user by ID", description = "Retrieves a user by ID")
-    public UserDto getUserById(@PathVariable("id") @Parameter(description = "User ID") final long id) {
+    public UserDto getUser(@PathVariable("id") @Parameter(description = "User ID") final long id) {
         log.info("Getting user with ID: {}", id);
         return userMapper.toDto(userService.findById(id));
     }

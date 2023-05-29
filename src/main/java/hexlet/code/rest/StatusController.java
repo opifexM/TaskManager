@@ -37,14 +37,14 @@ public class StatusController {
 
     @GetMapping("")
     @Operation(summary = "List all statuses", description = "Retrieves all statuses")
-    public List<StatusDto> listAllStatuses() {
+    public List<StatusDto> getAllStatuses() {
         log.info("Listing all statuses");
         return statusService.findAll().stream().map(statusMapper::toDto).toList();
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Get status by ID", description = "Retrieves a status by ID")
-    public StatusDto getStatusById(@PathVariable("id") @Parameter(description = "Status ID") final long id) {
+    public StatusDto getStatus(@PathVariable("id") @Parameter(description = "Status ID") final long id) {
         log.info("Getting status with ID: {}", id);
         return statusMapper.toDto(statusService.findById(id));
     }

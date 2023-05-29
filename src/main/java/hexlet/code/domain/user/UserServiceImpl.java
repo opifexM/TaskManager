@@ -127,6 +127,4 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 user.getPassword(),
                 List.of(new SimpleGrantedAuthority("USER")));
     }
-
-
 }
