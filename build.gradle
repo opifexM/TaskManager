@@ -71,6 +71,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'com.github.javafaker:javafaker:1.0.2'
 }
 
 //compileJava {
