@@ -12,22 +12,15 @@ import org.mapstruct.ReportingPolicy;
 public interface StatusMapper {
     Status toEntity(StatusDto statusDto);
 
-    Status toEntity(StatusCreationDto statusCreationDto);
-
-    Status toEntity(StatusChangingDto statusChangingDto);
+    Status toEntity(StatusOperationDto statusOperationDto);
 
     StatusDto toDto(Status status);
 
-    StatusCreationDto toCreationDto(Status status);
-
-    StatusChangingDto toChangingDto(Status status);
+    StatusOperationDto toCreationDto(Status status);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Status partialUpdate(StatusDto statusDto, @MappingTarget Status status);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Status partialUpdate(StatusCreationDto statusCreationDto, @MappingTarget Status status);
-
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Status partialUpdate(StatusChangingDto statusChangingDto, @MappingTarget Status status);
+    Status partialUpdate(StatusOperationDto statusOperationDto, @MappingTarget Status status);
 }

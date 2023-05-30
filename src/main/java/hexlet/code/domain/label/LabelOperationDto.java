@@ -14,7 +14,7 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LabelCreationDto implements Serializable {
+public class LabelOperationDto implements Serializable {
     @Size(message = "Label name must be between 1 and 50 characters", min = 1, max = 50)
     @NotBlank(message = "Label name cannot be blank")
     private String name;

@@ -16,7 +16,7 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TaskChangingDto implements Serializable {
+public class TaskOperationDto implements Serializable {
     @Size(message = "Task name must be between 1 and 255 characters", min = 1, max = 255)
     @NotBlank(message = "Task name cannot be blank")
     private String name;
@@ -26,7 +26,6 @@ public class TaskChangingDto implements Serializable {
     @NotNull(message = "Task status cannot be Null")
     private Long taskStatusId;
 
-    // @NotNull(message = "Task author cannot be Null")
     private Long authorId;
 
     private Long executorId;

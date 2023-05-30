@@ -1,10 +1,9 @@
 package hexlet.code.rest;
 
 import hexlet.code.domain.label.Label;
-import hexlet.code.domain.label.LabelChangingDto;
-import hexlet.code.domain.label.LabelCreationDto;
 import hexlet.code.domain.label.LabelDto;
 import hexlet.code.domain.label.LabelMapper;
+import hexlet.code.domain.label.LabelOperationDto;
 import hexlet.code.domain.label.LabelService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -52,9 +51,9 @@ public class LabelController {
     @PostMapping("")
     @Operation(summary = "Create a new label", description = "Creates a new label")
     public LabelDto createLabel(
-            @Valid @RequestBody @Parameter(description = "Label object") final LabelCreationDto labelCreationDto) {
-        log.info("Creating a new label: {}", labelCreationDto);
-        Label labelToCreate = labelMapper.toEntity(labelCreationDto);
+            @Valid @RequestBody @Parameter(description = "Label object") final LabelOperationDto labelOperationDto) {
+        log.info("Creating a new label: {}", labelOperationDto);
+        Label labelToCreate = labelMapper.toEntity(labelOperationDto);
         Label savedLabel = labelService.save(labelToCreate);
         return labelMapper.toDto(savedLabel);
     }
@@ -63,11 +62,11 @@ public class LabelController {
     @Operation(summary = "Update label by ID", description = "Updates label information by ID")
     public LabelDto updateLabel(
             @Valid @RequestBody
-            @Parameter(description = "Updated label object") final LabelChangingDto labelChangingDto,
+            @Parameter(description = "Updated label object") final LabelOperationDto labelOperationDto,
             @PathVariable("id")
             @Parameter(description = "Label ID") final long id) {
-        log.info("Updating label with ID: {} with data: {}", id, labelChangingDto);
-        Label labelToUpdate = labelMapper.toEntity(labelChangingDto);
+        log.info("Updating label with ID: {} with data: {}", id, labelOperationDto);
+        Label labelToUpdate = labelMapper.toEntity(labelOperationDto);
         Label updatedLabel = labelService.updateById(labelToUpdate, id);
         return labelMapper.toDto(updatedLabel);
     }

@@ -1,10 +1,9 @@
 package hexlet.code.rest;
 
 import hexlet.code.domain.task.Task;
-import hexlet.code.domain.task.TaskChangingDto;
-import hexlet.code.domain.task.TaskCreationDto;
 import hexlet.code.domain.task.TaskDto;
 import hexlet.code.domain.task.TaskMapper;
+import hexlet.code.domain.task.TaskOperationDto;
 import hexlet.code.domain.task.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -72,14 +71,14 @@ public class TaskController {
     @PostMapping("")
     @Operation(summary = "Create a new task", description = "Creates a new task")
     public TaskDto createTask(
-            @Valid @RequestBody @Parameter(description = "Task object") final TaskCreationDto taskCreationDto) {
-        log.info("Creating a new task: {}", taskCreationDto);
+            @Valid @RequestBody @Parameter(description = "Task object") final TaskOperationDto taskOperationDto) {
+        log.info("Creating a new task: {}", taskOperationDto);
 
-        Task taskToCreate = taskMapper.toEntity(taskCreationDto);
+        Task taskToCreate = taskMapper.toEntity(taskOperationDto);
         @SuppressWarnings("DataFlowIssue")
-        Optional<Long> taskStatusId = Optional.ofNullable(taskCreationDto.getTaskStatusId());
-        Optional<Long> executorId = Optional.ofNullable(taskCreationDto.getExecutorId());
-        Optional<Set<Long>> labelIds = Optional.ofNullable(taskCreationDto.getLabelIds());
+        Optional<Long> taskStatusId = Optional.ofNullable(taskOperationDto.getTaskStatusId());
+        Optional<Long> executorId = Optional.ofNullable(taskOperationDto.getExecutorId());
+        Optional<Set<Long>> labelIds = Optional.ofNullable(taskOperationDto.getLabelIds());
         Task savedTask = taskService.configureAndSaveTask(taskToCreate, taskStatusId, executorId, labelIds);
         return taskMapper.toDto(savedTask);
     }
@@ -87,14 +86,14 @@ public class TaskController {
     @PutMapping("/{id}")
     @Operation(summary = "Update task by ID", description = "Updates task information by ID")
     public TaskDto updateTask(
-            @Valid @RequestBody @Parameter(description = "Updated task object") final TaskChangingDto taskChangingDto,
+            @Valid @RequestBody @Parameter(description = "Updated task object") final TaskOperationDto taskOperationDto,
             @PathVariable("id") @Parameter(description = "Task ID") final long id) {
-        log.info("Updating task with ID: {} with data: {}", id, taskChangingDto);
+        log.info("Updating task with ID: {} with data: {}", id, taskOperationDto);
 
-        Task taskToUpdate = taskMapper.toEntity(taskChangingDto);
-        long taskStatusId = Optional.of(taskChangingDto.getTaskStatusId()).orElse(0L);
-        long executorId = Optional.ofNullable(taskChangingDto.getExecutorId()).orElse(0L);
-        Set<Long> labelIds = Optional.ofNullable(taskChangingDto.getLabelIds()).orElse(new HashSet<>());
+        Task taskToUpdate = taskMapper.toEntity(taskOperationDto);
+        long taskStatusId = Optional.of(taskOperationDto.getTaskStatusId()).orElse(0L);
+        long executorId = Optional.ofNullable(taskOperationDto.getExecutorId()).orElse(0L);
+        Set<Long> labelIds = Optional.ofNullable(taskOperationDto.getLabelIds()).orElse(new HashSet<>());
 
         Task updatedTask = taskService.updateTask(taskToUpdate, taskStatusId, executorId, labelIds, id);
         return taskMapper.toDto(updatedTask);

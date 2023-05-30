@@ -1,10 +1,9 @@
 package hexlet.code.rest;
 
 import hexlet.code.domain.status.Status;
-import hexlet.code.domain.status.StatusChangingDto;
-import hexlet.code.domain.status.StatusCreationDto;
 import hexlet.code.domain.status.StatusDto;
 import hexlet.code.domain.status.StatusMapper;
+import hexlet.code.domain.status.StatusOperationDto;
 import hexlet.code.domain.status.StatusService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -52,9 +51,9 @@ public class StatusController {
     @PostMapping("")
     @Operation(summary = "Create a new status", description = "Creates a new status")
     public StatusDto createStatus(
-            @Valid @RequestBody @Parameter(description = "Status object") final StatusCreationDto statusCreationDto) {
-        log.info("Creating a new status: {}", statusCreationDto);
-        Status statusToCreate = statusMapper.toEntity(statusCreationDto);
+            @Valid @RequestBody @Parameter(description = "Status object") final StatusOperationDto statusOperationDto) {
+        log.info("Creating a new status: {}", statusOperationDto);
+        Status statusToCreate = statusMapper.toEntity(statusOperationDto);
         Status savedStatus = statusService.save(statusToCreate);
         return statusMapper.toDto(savedStatus);
     }
@@ -63,11 +62,11 @@ public class StatusController {
     @Operation(summary = "Update status by ID", description = "Updates status information by ID")
     public StatusDto updateStatus(
             @Valid @RequestBody
-            @Parameter(description = "Updated status object") final StatusChangingDto statusChangingDto,
+            @Parameter(description = "Updated status object") final StatusOperationDto statusOperationDto,
             @PathVariable("id")
             @Parameter(description = "Status ID") final long id) {
-        log.info("Updating status with ID: {} with data: {}", id, statusChangingDto);
-        Status statusToUpdate = statusMapper.toEntity(statusChangingDto);
+        log.info("Updating status with ID: {} with data: {}", id, statusOperationDto);
+        Status statusToUpdate = statusMapper.toEntity(statusOperationDto);
         Status updatedStatus = statusService.updateById(statusToUpdate, id);
         return statusMapper.toDto(updatedStatus);
     }

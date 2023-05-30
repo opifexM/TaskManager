@@ -17,12 +17,7 @@ public interface TaskMapper {
     @Mapping(target = "author", ignore = true)
     @Mapping(target = "executor", ignore = true)
     @Mapping(target = "labels", ignore = true)
-    Task toEntity(TaskCreationDto taskCreationDto);
-
-    @Mapping(target = "taskStatus", ignore = true)
-    @Mapping(target = "author", ignore = true)
-    @Mapping(target = "labels", ignore = true)
-    Task toEntity(TaskChangingDto taskChangingDto);
+    Task toEntity(TaskOperationDto taskOperationDto);
 
     TaskDto toDto(Task task);
 

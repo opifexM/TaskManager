@@ -16,7 +16,7 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserChangingDto implements Serializable {
+public class UserOperationDto implements Serializable {
 
     @Size(message = "First name cannot exceed 50 characters", max = 50)
     @NotBlank(message = "First name cannot be blank")

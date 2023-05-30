@@ -1,11 +1,9 @@
 package hexlet.code.rest;
 
-import com.rollbar.notifier.Rollbar;
 import hexlet.code.domain.user.User;
-import hexlet.code.domain.user.UserChangingDto;
-import hexlet.code.domain.user.UserCreationDto;
 import hexlet.code.domain.user.UserDto;
 import hexlet.code.domain.user.UserMapper;
+import hexlet.code.domain.user.UserOperationDto;
 import hexlet.code.domain.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -36,9 +34,6 @@ public class UserController {
     private final UserMapper userMapper;
 
     private final UserService userService;
-
-    private final Rollbar rollbar;
-
     @GetMapping("")
     @Operation(summary = "List all users", description = "Retrieves all users")
     public List<UserDto> getAllUsers() {
@@ -57,9 +52,9 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a new user", description = "Creates a new user")
     public UserDto createUser(
-            @Valid @RequestBody @Parameter(description = "User object") final UserCreationDto userCreationDTO) {
-        log.info("Creating a new user: {}", userCreationDTO);
-        User userToCreate = userMapper.toEntity(userCreationDTO);
+            @Valid @RequestBody @Parameter(description = "User object") final UserOperationDto userOperationDTO) {
+        log.info("Creating a new user: {}", userOperationDTO);
+        User userToCreate = userMapper.toEntity(userOperationDTO);
         User savedUser = userService.save(userToCreate);
         return userMapper.toDto(savedUser);
     }
@@ -68,10 +63,10 @@ public class UserController {
     @PreAuthorize("@userSecurityService.isOwner(#id)")
     @Operation(summary = "Update user by ID", description = "Updates user information by ID")
     public UserDto updateUser(
-            @Valid @RequestBody @Parameter(description = "Updated user object") final UserChangingDto userChangingDTO,
+            @Valid @RequestBody @Parameter(description = "Updated user object") final UserOperationDto userOperationDto,
             @PathVariable("id") @Parameter(description = "User ID") final long id) {
-        log.info("Updating user with ID: {} with data: {}", id, userChangingDTO);
-        User userToUpdate = userMapper.toEntity(userChangingDTO);
+        log.info("Updating user with ID: {} with data: {}", id, userOperationDto);
+        User userToUpdate = userMapper.toEntity(userOperationDto);
         User updatedUser = userService.updateById(userToUpdate, id);
         return userMapper.toDto(updatedUser);
     }

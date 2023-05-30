@@ -12,22 +12,15 @@ import org.mapstruct.ReportingPolicy;
 public interface LabelMapper {
     Label toEntity(LabelDto labelDto);
 
-    Label toEntity(LabelChangingDto labelChangingDto);
-
-    Label toEntity(LabelCreationDto labelCreationDto);
+    Label toEntity(LabelOperationDto labelOperationDto);
 
     LabelDto toDto(Label label);
 
-    LabelCreationDto toCreationDto(Label label);
-
-    LabelChangingDto toChangingDto(Label label);
+    LabelOperationDto toCreationDto(Label label);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Label partialUpdate(LabelDto labelDto, @MappingTarget Label label);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Label partialUpdate(LabelCreationDto labelCreationDto, @MappingTarget Label label);
-
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Label partialUpdate(LabelChangingDto labelChangingDto, @MappingTarget Label label);
+    Label partialUpdate(LabelOperationDto labelOperationDto, @MappingTarget Label label);
 }
