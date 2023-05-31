@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -379,7 +380,7 @@ class TaskControllerTest {
         // create task
         String taskName = faker.pokemon().name() + faker.number().digits(3);
         String taskDescription = faker.backToTheFuture().quote() + faker.number().digits(3);
-        TaskDto newTask = testHelper.createNewTask(
+        testHelper.createNewTask(
                 taskName,
                 taskDescription,
                 statusId,
@@ -501,5 +502,101 @@ class TaskControllerTest {
 
         // expect HTTP 409 Conflict
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+    }
+
+    @Test
+    void shouldReturnFilteredTasks() {
+        // Create tasks with different parameters
+        Set<Long> anotherLabelIdSet = testHelper.createLabelIdSet(2, requestWithJWTToken, apiLabelUrl);
+        Long anotherExecutorId = testHelper.registerUser(
+                faker.name().firstName(),
+                faker.name().lastName(),
+                faker.internet().emailAddress(),
+                faker.internet().password(),
+                apiUserUrl).getId();
+
+        // Create 5 tasks with original parameters
+        for (int i = 0; i < 5; i++) {
+            testHelper.createNewTask(
+                    faker.pokemon().name() + faker.number().digits(3),
+                    faker.backToTheFuture().quote() + faker.number().digits(3),
+                    statusId,
+                    executorId,
+                    labelIdSet,
+                    requestWithJWTToken,
+                    apiTaskUrl);
+        }
+
+        // Create 5 tasks with different executor and label
+        for (int i = 0; i < 5; i++) {
+            testHelper.createNewTask(
+                    faker.pokemon().name() + faker.number().digits(3),
+                    faker.backToTheFuture().quote() + faker.number().digits(3),
+                    statusId,
+                    anotherExecutorId,
+                    anotherLabelIdSet,
+                    requestWithJWTToken,
+                    apiTaskUrl);
+        }
+
+        // Test filtering by task status
+        String uri = UriComponentsBuilder
+                .fromHttpUrl(apiTaskUrl)
+                .queryParam("taskStatus", statusId)
+                .toUriString();
+
+        ResponseEntity<List<TaskDto>> response = restTemplate.exchange(
+                uri,
+                HttpMethod.GET,
+                requestWithJWTToken,
+                new ParameterizedTypeReference<>() {
+                });
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        List<TaskDto> returnedTasks = response.getBody();
+        assertThat(returnedTasks)
+                .isNotNull()
+                .isNotEmpty()
+                .allSatisfy(task -> assertThat(
+                        task.getTaskStatus().getId()).isEqualTo(statusId)
+                );
+
+        // Test filtering by executor
+        uri = UriComponentsBuilder.fromHttpUrl(apiTaskUrl)
+                .queryParam("executorId", executorId)
+                .toUriString();
+        response = restTemplate.exchange(
+                uri,
+                HttpMethod.GET,
+                requestWithJWTToken,
+                new ParameterizedTypeReference<>() {
+                });
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        returnedTasks = response.getBody();
+        assertThat(returnedTasks)
+                .isNotNull()
+                .isNotEmpty()
+                .allSatisfy(task -> assertThat(
+                        task.getExecutor().getId()).isEqualTo(executorId)
+                );
+
+        // Test filtering by label
+        Long labelId = labelIdSet.iterator().next();
+        uri = UriComponentsBuilder.fromHttpUrl(apiTaskUrl)
+                .queryParam("labelsId", labelId)
+                .toUriString();
+        response = restTemplate.exchange(
+                uri,
+                HttpMethod.GET,
+                requestWithJWTToken,
+                new ParameterizedTypeReference<>() {
+                });
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        returnedTasks = response.getBody();
+        assertThat(returnedTasks)
+                .isNotNull()
+                .isNotEmpty()
+                .allSatisfy(task -> assertTrue(
+                        task.getLabels().stream().anyMatch(label -> label.getId().equals(labelId)))
+                );
     }
 }
