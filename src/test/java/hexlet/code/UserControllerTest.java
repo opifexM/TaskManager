@@ -38,13 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-// @Transactional
-// @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class UserControllerTest {
-
-    private static final String BASE_URL = "http://localhost:";
-    private static final String API_LOGIN = "/api/login";
-    private static final String API_USERS = "/api/users";
 
     private String apiUserUrl;
     private String apiUserLoginUrl;
@@ -58,6 +52,9 @@ class UserControllerTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
+
+    @Autowired
+    private TestHelper testHelper;
 
     private static final PostgreSQLContainer<?> postgres
             = new PostgreSQLContainer<>(DockerImageName.parse("postgres:latest"));
@@ -75,64 +72,22 @@ class UserControllerTest {
 
     @BeforeAll
     void setupTest() {
-        apiUserUrl = BASE_URL + port + API_USERS;
-        apiUserLoginUrl = BASE_URL + port + API_LOGIN;
+        apiUserUrl = TestHelper.BASE_URL + port + TestHelper.API_USERS;
+        apiUserLoginUrl = TestHelper.BASE_URL + port + TestHelper.API_LOGIN;
     }
 
-    public UserDto registerUser(String firstName, String lastName,
-                                String emailAddress, String password) {
 
-        UserOperationDto userForRegistration = new UserOperationDto(firstName, lastName, emailAddress, password);
-        String userJson;
-        try {
-            userJson = OBJECT_MAPPER.writeValueAsString(userForRegistration);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> request = new HttpEntity<>(userJson, headers);
-        assertThat(request).isNotNull();
-
-        ResponseEntity<UserDto> response = restTemplate.exchange(apiUserUrl, HttpMethod.POST, request, UserDto.class);
-        assertThat(response).isNotNull();
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        return response.getBody();
-    }
-
-    public HttpEntity<String> loginUser(String emailAddress, String password) {
-
-        UserOperationDto userForLogin = new UserOperationDto(null, null, emailAddress, password);
-        String userJson;
-        try {
-            userJson = OBJECT_MAPPER.writeValueAsString(userForLogin);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> request = new HttpEntity<>(userJson, headers);
-        assertThat(request).isNotNull();
-
-        ResponseEntity<String> response = restTemplate.exchange(apiUserLoginUrl, HttpMethod.POST, request, String.class);
-        assertThat(response).isNotNull();
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-        headers.set("Authorization", "Bearer " + response.getBody().trim());
-        HttpEntity<String> requestWithJWTToken = new HttpEntity<>("", headers);
-        assertThat(requestWithJWTToken).isNotNull();
-        return requestWithJWTToken;
-    }
 
     @Test
     void shouldRegisterSuccessfully() {
-        // registration
+        // user registration
         String password = faker.internet().password();
-        UserDto registerUser = registerUser(
+        UserDto registerUser = testHelper.registerUser(
                 faker.name().firstName(),
                 faker.name().lastName(),
                 faker.internet().emailAddress(),
-                password);
+                password,
+                apiUserUrl);
 
         assertThat(registerUser)
                 .isNotNull()
@@ -146,31 +101,39 @@ class UserControllerTest {
 
     @Test
     void shouldLoginUserSuccessfully() {
-        // registration
+        // user registration
         String password = faker.internet().password();
-        UserDto registerUser = registerUser(
+        UserDto registerUser = testHelper.registerUser(
                 faker.name().firstName(),
                 faker.name().lastName(),
                 faker.internet().emailAddress(),
-                password);
+                password,
+                apiUserUrl);
 
-        // login
-        HttpEntity<String> requestWithJWTToken = loginUser(registerUser.getEmail(), password);
+        // user login
+        HttpEntity<String> requestWithJWTToken = testHelper.loginUser(
+                registerUser.getEmail(),
+                password,
+                apiUserLoginUrl);
         assertThat(requestWithJWTToken).isNotNull();
     }
 
     @Test
     void shouldReturnUserDetailsWhenValidUserIdProvided() {
-        // registration
+        // user registration
         String password = faker.internet().password();
-        UserDto registerUser = registerUser(
+        UserDto registerUser = testHelper.registerUser(
                 faker.name().firstName(),
                 faker.name().lastName(),
                 faker.internet().emailAddress(),
-                password);
+                password,
+                apiUserUrl);
 
-        // login
-        HttpEntity<String> requestWithJWTToken = loginUser(registerUser.getEmail(), password);
+        // user login
+        HttpEntity<String> requestWithJWTToken = testHelper.loginUser(
+                registerUser.getEmail(),
+                password,
+                apiUserLoginUrl);
 
         // check current user
         Long userId = registerUser.getId();
@@ -180,7 +143,8 @@ class UserControllerTest {
                 .buildAndExpand(userId)
                 .toUriString();
 
-        ResponseEntity<UserDto> response = restTemplate.exchange(url, HttpMethod.GET, requestWithJWTToken, UserDto.class);
+        ResponseEntity<UserDto> response = restTemplate.exchange(url, HttpMethod.GET,
+                requestWithJWTToken, UserDto.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         UserDto currentUser = response.getBody();
 
@@ -198,13 +162,13 @@ class UserControllerTest {
     void shouldReturnAllRegisteredUsersSuccessfully() {
         List<User> registrationUserList = new ArrayList<>();
 
-        // registration
+        // user registration
         for (int i = 0; i < 10; i++) {
             String firstName = faker.name().firstName();
             String lastName = faker.name().lastName();
             String email = faker.internet().emailAddress();
             String password = faker.internet().password();
-            registerUser(firstName, lastName, email, password);
+            testHelper.registerUser(firstName, lastName, email, password, apiUserUrl);
 
             User user = new User();
             user.setEmail(email);
@@ -215,10 +179,11 @@ class UserControllerTest {
         }
         assertThat(registrationUserList).isNotEmpty();
 
-        // login
-        HttpEntity<String> requestWithJWTToken = loginUser(
+        // user login
+        HttpEntity<String> requestWithJWTToken = testHelper.loginUser(
                 registrationUserList.get(0).getEmail(),
-                registrationUserList.get(0).getPassword());
+                registrationUserList.get(0).getPassword(),
+                apiUserLoginUrl);
 
         // check user list
         ResponseEntity<List<UserDto>> response = restTemplate.exchange(apiUserUrl, HttpMethod.GET,
@@ -298,16 +263,20 @@ class UserControllerTest {
 
     @Test
     void shouldUpdateUserDetailsSuccessfully() throws JsonProcessingException {
-        // registration
+        // user registration
         String password = faker.internet().password();
-        UserDto registerUser = registerUser(
+        UserDto registerUser = testHelper.registerUser(
                 faker.name().firstName(),
                 faker.name().lastName(),
                 faker.internet().emailAddress(),
-                password);
+                password,
+                apiUserUrl);
 
-        // login
-        HttpEntity<String> requestWithJWTToken = loginUser(registerUser.getEmail(), password);
+        // user login
+        HttpEntity<String> requestWithJWTToken = testHelper.loginUser(
+                registerUser.getEmail(),
+                password,
+                apiUserLoginUrl);
 
         // check current user
         Long userId = registerUser.getId();
@@ -317,7 +286,8 @@ class UserControllerTest {
                 .buildAndExpand(userId)
                 .toUriString();
 
-        ResponseEntity<UserDto> response = restTemplate.exchange(url, HttpMethod.GET, requestWithJWTToken, UserDto.class);
+        ResponseEntity<UserDto> response = restTemplate.exchange(url, HttpMethod.GET,
+                requestWithJWTToken, UserDto.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         UserDto currentUser = response.getBody();
@@ -330,7 +300,7 @@ class UserControllerTest {
                     assertThat(u.getEmail()).isEqualTo(registerUser.getEmail());
                 });
 
-        // update
+        // update user
         UserOperationDto userForUpdate = new UserOperationDto(
                 faker.name().firstName(),
                 faker.name().lastName(),
@@ -356,16 +326,20 @@ class UserControllerTest {
 
     @Test
     void shouldDeleteUserSuccessfullyAndReturnNotFoundAfterDeletion() {
-        // registration
+        // user registration
         String password = faker.internet().password();
-        UserDto registerUser = registerUser(
+        UserDto registerUser = testHelper.registerUser(
                 faker.name().firstName(),
                 faker.name().lastName(),
                 faker.internet().emailAddress(),
-                password);
+                password,
+                apiUserUrl);
 
-        // login
-        HttpEntity<String> requestWithJWTToken = loginUser(registerUser.getEmail(), password);
+        // user login
+        HttpEntity<String> requestWithJWTToken = testHelper.loginUser(
+                registerUser.getEmail(),
+                password,
+                apiUserLoginUrl);
 
         // check current user
         Long userId = registerUser.getId();
@@ -375,7 +349,8 @@ class UserControllerTest {
                 .buildAndExpand(userId)
                 .toUriString();
 
-        ResponseEntity<UserDto> response = restTemplate.exchange(url, HttpMethod.GET, requestWithJWTToken, UserDto.class);
+        ResponseEntity<UserDto> response = restTemplate.exchange(url, HttpMethod.GET,
+                requestWithJWTToken, UserDto.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         UserDto currentUser = response.getBody();
@@ -388,7 +363,7 @@ class UserControllerTest {
                     assertThat(u.getEmail()).isEqualTo(registerUser.getEmail());
                 });
 
-        // delete
+        // delete user
         response = restTemplate.exchange(url, HttpMethod.DELETE, requestWithJWTToken, UserDto.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
