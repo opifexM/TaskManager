@@ -6,6 +6,7 @@ import com.github.javafaker.Faker;
 import hexlet.code.domain.label.LabelDto;
 import hexlet.code.domain.label.LabelOperationDto;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -46,9 +47,10 @@ class LabelControllerTest {
         postgres.start();
     }
 
+    HttpEntity<String> requestWithJWTToken;
     private String apiUserLoginUrl;
     private String apiUserUrl;
-    private String apiLabelsUrl;
+    private String apiLabelUrl;
     @LocalServerPort
     private int port;
     @Autowired
@@ -67,40 +69,44 @@ class LabelControllerTest {
     void setupTest() {
         apiUserLoginUrl = TestHelper.BASE_URL + port + TestHelper.API_LOGIN;
         apiUserUrl = TestHelper.BASE_URL + port + TestHelper.API_USERS;
-        apiLabelsUrl = TestHelper.BASE_URL + port + TestHelper.API_LABELS;
+        apiLabelUrl = TestHelper.BASE_URL + port + TestHelper.API_LABELS;
+    }
+
+    @BeforeEach
+    void registerAndLoginBeforeEachTest() {
+        // registration + login
+        requestWithJWTToken = testHelper.registerAndLoginReturnJWTToken(apiUserUrl, apiUserLoginUrl);
     }
 
     @Test
     void shouldCreateLabelSuccessfully() {
-        // registration + login
-        HttpEntity<String> requestWithJWTToken = testHelper.registerAndLoginReturnJWTToken(apiUserUrl, apiUserLoginUrl);
-
         // create label
         String labelName = faker.color().name() + faker.number().digits(3);
-        LabelDto newLabel = testHelper.createNewLabel(labelName, requestWithJWTToken, apiLabelsUrl);
+        LabelDto newLabel = testHelper.createNewLabel(labelName, requestWithJWTToken, apiLabelUrl);
 
-        assertThat(newLabel).isNotNull().satisfies(l -> {
-            assertThat(l.getId()).isPositive();
-            assertThat(l.getName()).isEqualTo(labelName);
-        });
+        assertThat(newLabel)
+                .isNotNull()
+                .satisfies(l -> {
+                    assertThat(l.getId()).isPositive();
+                    assertThat(l.getName()).isEqualTo(labelName);
+                });
     }
 
     @Test
     void shouldReturnLabelDetailsWhenValidLabelIdProvided() {
-        // registration + login
-        HttpEntity<String> requestWithJWTToken = testHelper.registerAndLoginReturnJWTToken(apiUserUrl, apiUserLoginUrl);
-
         // create label
         LabelDto newLabel = testHelper.createNewLabel(
-                faker.color().name()+ faker.number().digits(3),
+                faker.color().name() + faker.number().digits(3),
                 requestWithJWTToken,
-                apiLabelsUrl);
+                apiLabelUrl);
 
         // check label
         Long labelId = newLabel.getId();
-        assertThat(labelId).isNotNull().isPositive();
+        assertThat(labelId)
+                .isNotNull()
+                .isPositive();
         String url = UriComponentsBuilder
-                .fromHttpUrl(apiLabelsUrl + "/{id}")
+                .fromHttpUrl(apiLabelUrl + "/{id}")
                 .buildAndExpand(labelId)
                 .toUriString();
 
@@ -109,24 +115,23 @@ class LabelControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         LabelDto currentLabel = response.getBody();
 
-        assertThat(currentLabel).isNotNull().satisfies(l -> {
-            assertThat(l.getId()).isEqualTo(labelId);
-            assertThat(l.getName()).isEqualTo(newLabel.getName());
-        });
+        assertThat(currentLabel)
+                .isNotNull()
+                .satisfies(l -> {
+                    assertThat(l.getId()).isEqualTo(labelId);
+                    assertThat(l.getName()).isEqualTo(newLabel.getName());
+                });
     }
 
     @Test
     void shouldReturnAllCreatedLabelsSuccessfully() {
-        // registration + login
-        HttpEntity<String> requestWithJWTToken = testHelper.registerAndLoginReturnJWTToken(apiUserUrl, apiUserLoginUrl);
-
         // create label
         List<LabelDto> labelForCreateList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             LabelDto newLabel = testHelper.createNewLabel(
                     faker.color().name() + faker.number().digits(3),
                     requestWithJWTToken,
-                    apiLabelsUrl);
+                    apiLabelUrl);
             assertThat(newLabel).isNotNull();
             labelForCreateList.add(newLabel);
         }
@@ -134,14 +139,16 @@ class LabelControllerTest {
 
         // check label list
         ResponseEntity<List<LabelDto>> response = restTemplate.exchange(
-                apiLabelsUrl,
+                apiLabelUrl,
                 HttpMethod.GET,
                 requestWithJWTToken,
                 new ParameterizedTypeReference<>() {
                 });
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         List<LabelDto> returnedLabelList = response.getBody();
-        assertThat(returnedLabelList).isNotNull().isNotEmpty();
+        assertThat(returnedLabelList)
+                .isNotNull()
+                .isNotEmpty();
 
         for (LabelDto label : returnedLabelList) {
             assertThat(returnedLabelList.stream().anyMatch(
@@ -154,13 +161,10 @@ class LabelControllerTest {
     @MethodSource("provideInvalidLabelOperationDto")
     void shouldReturnBadRequestWhenInvalidLabelDataProvided(LabelOperationDto labelForCreate)
             throws JsonProcessingException {
-        // registration + login
-        HttpEntity<String> requestWithJWTToken = testHelper.registerAndLoginReturnJWTToken(apiUserUrl, apiUserLoginUrl);
-
         // create label
         String userJson = OBJECT_MAPPER.writeValueAsString(labelForCreate);
         HttpEntity<String> requestWithBodyAndToken = new HttpEntity<>(userJson, requestWithJWTToken.getHeaders());
-        ResponseEntity<LabelDto> response = restTemplate.exchange(apiLabelsUrl, HttpMethod.POST,
+        ResponseEntity<LabelDto> response = restTemplate.exchange(apiLabelUrl, HttpMethod.POST,
                 requestWithBodyAndToken, LabelDto.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
@@ -173,20 +177,19 @@ class LabelControllerTest {
 
     @Test
     void shouldUpdateLabelDetailsSuccessfully() throws JsonProcessingException {
-        // registration + login
-        HttpEntity<String> requestWithJWTToken = testHelper.registerAndLoginReturnJWTToken(apiUserUrl, apiUserLoginUrl);
-
         // create label
         LabelDto newLabel = testHelper.createNewLabel(
                 faker.color().name() + faker.number().digits(3),
                 requestWithJWTToken,
-                apiLabelsUrl);
+                apiLabelUrl);
 
         // check label
         Long labelId = newLabel.getId();
-        assertThat(labelId).isNotNull().isPositive();
+        assertThat(labelId)
+                .isNotNull()
+                .isPositive();
         String url = UriComponentsBuilder
-                .fromHttpUrl(apiLabelsUrl + "/{id}")
+                .fromHttpUrl(apiLabelUrl + "/{id}")
                 .buildAndExpand(labelId)
                 .toUriString();
 
@@ -195,10 +198,12 @@ class LabelControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         LabelDto currentLabel = response.getBody();
 
-        assertThat(currentLabel).isNotNull().satisfies(l -> {
-            assertThat(l.getId()).isEqualTo(labelId);
-            assertThat(l.getName()).isEqualTo(newLabel.getName());
-        });
+        assertThat(currentLabel)
+                .isNotNull()
+                .satisfies(l -> {
+                    assertThat(l.getId()).isEqualTo(labelId);
+                    assertThat(l.getName()).isEqualTo(newLabel.getName());
+                });
 
         // update label
         LabelOperationDto labelForUpdate = new LabelOperationDto(faker.color().name());
@@ -209,28 +214,27 @@ class LabelControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         LabelDto updatedLabel = response.getBody();
-        assertThat(updatedLabel).isNotNull().satisfies(l -> {
-            assertThat(l.getId()).isEqualTo(labelId);
-            assertThat(l.getName()).isEqualTo(labelForUpdate.getName());
-        });
+        assertThat(updatedLabel)
+                .isNotNull()
+                .satisfies(l -> {
+                    assertThat(l.getId()).isEqualTo(labelId);
+                    assertThat(l.getName()).isEqualTo(labelForUpdate.getName());
+                });
     }
 
     @Test
     void shouldDeleteLabelSuccessfullyAndReturnNotFoundAfterDeletion() {
-        // registration + login
-        HttpEntity<String> requestWithJWTToken = testHelper.registerAndLoginReturnJWTToken(apiUserUrl, apiUserLoginUrl);
-
         // create label
         LabelDto newLabel = testHelper.createNewLabel(
                 faker.color().name() + faker.number().digits(3),
                 requestWithJWTToken,
-                apiLabelsUrl);
+                apiLabelUrl);
 
         // check label
         Long labelId = newLabel.getId();
         assertThat(labelId).isNotNull().isPositive();
         String url = UriComponentsBuilder
-                .fromHttpUrl(apiLabelsUrl + "/{id}")
+                .fromHttpUrl(apiLabelUrl + "/{id}")
                 .buildAndExpand(labelId)
                 .toUriString();
 
@@ -239,10 +243,12 @@ class LabelControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         LabelDto currentLabel = response.getBody();
 
-        assertThat(currentLabel).isNotNull().satisfies(l -> {
-            assertThat(l.getId()).isEqualTo(labelId);
-            assertThat(l.getName()).isEqualTo(newLabel.getName());
-        });
+        assertThat(currentLabel)
+                .isNotNull()
+                .satisfies(l -> {
+                    assertThat(l.getId()).isEqualTo(labelId);
+                    assertThat(l.getName()).isEqualTo(newLabel.getName());
+                });
 
         // delete status
         response = restTemplate.exchange(url, HttpMethod.DELETE, requestWithJWTToken, LabelDto.class);

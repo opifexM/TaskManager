@@ -7,6 +7,8 @@ import hexlet.code.domain.label.LabelDto;
 import hexlet.code.domain.label.LabelOperationDto;
 import hexlet.code.domain.status.StatusDto;
 import hexlet.code.domain.status.StatusOperationDto;
+import hexlet.code.domain.task.TaskDto;
+import hexlet.code.domain.task.TaskOperationDto;
 import hexlet.code.domain.user.UserDto;
 import hexlet.code.domain.user.UserOperationDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,16 +21,20 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Component
 public class TestHelper {
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     static final String BASE_URL = "http://localhost:";
     static final String API_LOGIN = "/api/login";
     static final String API_USERS = "/api/users";
     static final String API_LABELS = "/api/labels";
-
+    static final String API_STATUS = "/api/statuses";
+    static final String API_TASKS = "/api/tasks";
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final Faker faker = new Faker();
 
     @Autowired
@@ -96,9 +102,9 @@ public class TestHelper {
         return requestWithJWTToken;
     }
 
-    public LabelDto createNewLabel(String name, HttpEntity<String> requestWithJWTToken, String apiLabelsUrl) {
+    public LabelDto createNewLabel(String labelName, HttpEntity<String> requestWithJWTToken, String apiLabelsUrl) {
         // create label
-        LabelOperationDto labelForCreate = new LabelOperationDto(name);
+        LabelOperationDto labelForCreate = new LabelOperationDto(labelName);
         String userJson;
         try {
             userJson = OBJECT_MAPPER.writeValueAsString(labelForCreate);
@@ -113,9 +119,9 @@ public class TestHelper {
         return response.getBody();
     }
 
-    public StatusDto createNewStatus(String name, HttpEntity<String> requestWithJWTToken, String apiStatusUrl) {
+    public StatusDto createNewStatus(String statusName, HttpEntity<String> requestWithJWTToken, String apiStatusUrl) {
         // create status
-        StatusOperationDto statusForCreate = new StatusOperationDto(name);
+        StatusOperationDto statusForCreate = new StatusOperationDto(statusName);
         String userJson;
         try {
             userJson = OBJECT_MAPPER.writeValueAsString(statusForCreate);
@@ -128,5 +134,36 @@ public class TestHelper {
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         return response.getBody();
+    }
+
+    public TaskDto createNewTask(String taskName, String taskDescription, Long statusId, Long executorId,
+                                 Set<Long> labelIdSet, HttpEntity<String> requestWithJWTToken, String apiTaskUrl) {
+        // create task
+        TaskOperationDto taskForCreate = new TaskOperationDto(taskName, taskDescription, statusId,
+                null, executorId, labelIdSet);
+        String userJson;
+        try {
+            userJson = OBJECT_MAPPER.writeValueAsString(taskForCreate);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        HttpEntity<String> requestWithBodyAndToken = new HttpEntity<>(userJson, requestWithJWTToken.getHeaders());
+        ResponseEntity<TaskDto> response = restTemplate.exchange(apiTaskUrl, HttpMethod.POST,
+                requestWithBodyAndToken, TaskDto.class);
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        return response.getBody();
+    }
+
+    public Set<Long> createLabelIdSet(int number, HttpEntity<String> requestWithJWTToken, String apiLabelUrl) {
+        Set<Long> labelIdSet = new HashSet<>();
+        for (int i = 0; i < number; i++) {
+            LabelDto newLabel = createNewLabel(
+                    faker.color().name()+ faker.number().digits(3),
+                    requestWithJWTToken,
+                    apiLabelUrl);
+            labelIdSet.add(newLabel.getId());
+        }
+        return labelIdSet;
     }
 }

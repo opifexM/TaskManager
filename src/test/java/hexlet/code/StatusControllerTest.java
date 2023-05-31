@@ -3,10 +3,10 @@ package hexlet.code;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
-import hexlet.code.domain.label.LabelDto;
 import hexlet.code.domain.status.StatusDto;
 import hexlet.code.domain.status.StatusOperationDto;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -50,6 +50,9 @@ class StatusControllerTest {
     private String apiUserLoginUrl;
     private String apiUserUrl;
     private String apiStatusUrl;
+
+    HttpEntity<String> requestWithJWTToken;
+
     @LocalServerPort
     private int port;
     @Autowired
@@ -68,19 +71,24 @@ class StatusControllerTest {
     void setupTest() {
         apiUserLoginUrl = TestHelper.BASE_URL + port + TestHelper.API_LOGIN;
         apiUserUrl = TestHelper.BASE_URL + port + TestHelper.API_USERS;
-        apiStatusUrl = TestHelper.BASE_URL + port + TestHelper.API_LABELS;
+        apiStatusUrl = TestHelper.BASE_URL + port + TestHelper.API_STATUS;
+    }
+
+    @BeforeEach
+    void registerAndLoginBeforeEachTest() {
+        // registration + login
+        requestWithJWTToken = testHelper.registerAndLoginReturnJWTToken(apiUserUrl, apiUserLoginUrl);
     }
 
     @Test
     void shouldCreateStatusSuccessfully() {
-        // registration + login
-        HttpEntity<String> requestWithJWTToken = testHelper.registerAndLoginReturnJWTToken(apiUserUrl, apiUserLoginUrl);
-
         // create status
-        String statusName = faker.programmingLanguage().name() + faker.number().digits(3);
+        String statusName = faker.animal().name() + faker.number().digits(3);
         StatusDto newStatus = testHelper.createNewStatus(statusName, requestWithJWTToken, apiStatusUrl);
 
-        assertThat(newStatus).isNotNull().satisfies(s -> {
+        assertThat(newStatus)
+                .isNotNull()
+                .satisfies(s -> {
             assertThat(s.getId()).isPositive();
             assertThat(s.getName()).isEqualTo(statusName);
         });
@@ -88,18 +96,17 @@ class StatusControllerTest {
 
     @Test
     void shouldReturnStatusDetailsWhenValidLabelIdProvided() {
-        // registration + login
-        HttpEntity<String> requestWithJWTToken = testHelper.registerAndLoginReturnJWTToken(apiUserUrl, apiUserLoginUrl);
-
         // create status
-        LabelDto newStatus = testHelper.createNewLabel(
-                faker.programmingLanguage().name() + faker.number().digits(3),
+        StatusDto newStatus = testHelper.createNewStatus(
+                faker.animal().name() + faker.number().digits(3),
                 requestWithJWTToken,
                 apiStatusUrl);
 
         // check status
         Long statusId = newStatus.getId();
-        assertThat(statusId).isNotNull().isPositive();
+        assertThat(statusId)
+                .isNotNull()
+                .isPositive();
         String url = UriComponentsBuilder
                 .fromHttpUrl(apiStatusUrl + "/{id}")
                 .buildAndExpand(statusId)
@@ -110,7 +117,9 @@ class StatusControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         StatusDto currentStatus = response.getBody();
 
-        assertThat(currentStatus).isNotNull().satisfies(s -> {
+        assertThat(currentStatus)
+                .isNotNull()
+                .satisfies(s -> {
             assertThat(s.getId()).isEqualTo(statusId);
             assertThat(s.getName()).isEqualTo(newStatus.getName());
         });
@@ -118,14 +127,11 @@ class StatusControllerTest {
 
     @Test
     void shouldReturnAllCreatedStatusSuccessfully() {
-        // registration + login
-        HttpEntity<String> requestWithJWTToken = testHelper.registerAndLoginReturnJWTToken(apiUserUrl, apiUserLoginUrl);
-
         // create status
         List<StatusDto> statusForCreateList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             StatusDto newStatus = testHelper.createNewStatus(
-                    faker.programmingLanguage().name() + faker.number().digits(3),
+                    faker.animal().name() + faker.number().digits(3),
                     requestWithJWTToken,
                     apiStatusUrl);
             assertThat(newStatus).isNotNull();
@@ -142,7 +148,9 @@ class StatusControllerTest {
                 });
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         List<StatusDto> returnedLabelList = response.getBody();
-        assertThat(returnedLabelList).isNotNull().isNotEmpty();
+        assertThat(returnedLabelList)
+                .isNotNull()
+                .isNotEmpty();
 
         for (StatusDto status : returnedLabelList) {
             assertThat(returnedLabelList.stream().anyMatch(
@@ -155,10 +163,7 @@ class StatusControllerTest {
     @MethodSource("provideInvalidStatusOperationDto")
     void shouldReturnBadRequestWhenInvalidStatusDataProvided(StatusOperationDto statusForCreate)
             throws JsonProcessingException {
-        // registration + login
-        HttpEntity<String> requestWithJWTToken = testHelper.registerAndLoginReturnJWTToken(apiUserUrl, apiUserLoginUrl);
-
-        // create status
+         // create status
         String userJson = OBJECT_MAPPER.writeValueAsString(statusForCreate);
         HttpEntity<String> requestWithBodyAndToken = new HttpEntity<>(userJson, requestWithJWTToken.getHeaders());
         ResponseEntity<StatusDto> response = restTemplate.exchange(apiStatusUrl, HttpMethod.POST,
@@ -174,18 +179,17 @@ class StatusControllerTest {
 
     @Test
     void shouldUpdateStatusDetailsSuccessfully() throws JsonProcessingException {
-        // registration + login
-        HttpEntity<String> requestWithJWTToken = testHelper.registerAndLoginReturnJWTToken(apiUserUrl, apiUserLoginUrl);
-
         // create status
-        LabelDto newStatus = testHelper.createNewLabel(
-                faker.programmingLanguage().name() + faker.number().digits(3),
+        StatusDto newStatus = testHelper.createNewStatus(
+                faker.animal().name() + faker.number().digits(3),
                 requestWithJWTToken,
                 apiStatusUrl);
 
         // check status
         Long statusId = newStatus.getId();
-        assertThat(statusId).isNotNull().isPositive();
+        assertThat(statusId)
+                .isNotNull()
+                .isPositive();
         String url = UriComponentsBuilder
                 .fromHttpUrl(apiStatusUrl + "/{id}")
                 .buildAndExpand(statusId)
@@ -218,12 +222,9 @@ class StatusControllerTest {
 
     @Test
     void shouldDeleteStatusSuccessfullyAndReturnNotFoundAfterDeletion() {
-        // registration + login
-        HttpEntity<String> requestWithJWTToken = testHelper.registerAndLoginReturnJWTToken(apiUserUrl, apiUserLoginUrl);
-
         // create status
-        LabelDto newStatus = testHelper.createNewLabel(
-                faker.programmingLanguage().name() + faker.number().digits(3),
+        StatusDto newStatus = testHelper.createNewStatus(
+                faker.animal().name() + faker.number().digits(3),
                 requestWithJWTToken,
                 apiStatusUrl);
 

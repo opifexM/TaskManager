@@ -137,7 +137,9 @@ class UserControllerTest {
 
         // check current user
         Long userId = registerUser.getId();
-        assertThat(userId).isNotNull().isPositive();
+        assertThat(userId)
+                .isNotNull()
+                .isPositive();
         String url = UriComponentsBuilder
                 .fromHttpUrl(apiUserUrl + "/{id}")
                 .buildAndExpand(userId)
@@ -191,7 +193,9 @@ class UserControllerTest {
                 });
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         List<UserDto> returnedUserList = response.getBody();
-        assertThat(returnedUserList).isNotNull().isNotEmpty();
+        assertThat(returnedUserList)
+                .isNotNull()
+                .isNotEmpty();
 
         for (User user : registrationUserList) {
             assertThat(returnedUserList.stream().anyMatch(userDto ->
@@ -280,7 +284,9 @@ class UserControllerTest {
 
         // check current user
         Long userId = registerUser.getId();
-        assertThat(userId).isNotNull().isPositive();
+        assertThat(userId)
+                .isNotNull()
+                .isPositive();
         String url = UriComponentsBuilder
                 .fromHttpUrl(apiUserUrl + "/{id}")
                 .buildAndExpand(userId)
@@ -343,7 +349,9 @@ class UserControllerTest {
 
         // check current user
         Long userId = registerUser.getId();
-        assertThat(userId).isNotNull().isPositive();
+        assertThat(userId)
+                .isNotNull()
+                .isPositive();
         String url = UriComponentsBuilder
                 .fromHttpUrl(apiUserUrl + "/{id}")
                 .buildAndExpand(userId)
