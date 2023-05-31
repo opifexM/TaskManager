@@ -374,37 +374,37 @@ class TaskControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
-    // @Test
-    // void shouldThrowDuplicateTaskExceptionWhenTaskWithSameNameAlreadyExists() throws JsonProcessingException {
-    //     // create task
-    //     String taskName = faker.pokemon().name() + faker.number().digits(3);
-    //     String taskDescription = faker.backToTheFuture().quote() + faker.number().digits(3);
-    //     TaskDto newTask = testHelper.createNewTask(
-    //             taskName,
-    //             taskDescription,
-    //             statusId,
-    //             executorId,
-    //             labelIdSet,
-    //             requestWithJWTToken,
-    //             apiTaskUrl);
-    //
-    //     // create task with the same name
-    //     TaskOperationDto taskWithSameName = new TaskOperationDto(
-    //             taskName,
-    //             faker.backToTheFuture().quote() + faker.number().digits(3),
-    //             statusId,
-    //             null,
-    //             executorId,
-    //             labelIdSet);
-    //
-    //     String taskJson = OBJECT_MAPPER.writeValueAsString(taskWithSameName);
-    //     HttpEntity<String> requestWithBodyAndToken = new HttpEntity<>(taskJson, requestWithJWTToken.getHeaders());
-    //     ResponseEntity<TaskDto> response = restTemplate.exchange(apiTaskUrl, HttpMethod.POST,
-    //             requestWithBodyAndToken, TaskDto.class);
-    //
-    //     // check HTTP 422 Unprocessable Entity
-    //     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
-    // }
+    @Test
+    void shouldThrowDuplicateTaskExceptionWhenTaskWithSameNameAlreadyExists() throws JsonProcessingException {
+        // create task
+        String taskName = faker.pokemon().name() + faker.number().digits(3);
+        String taskDescription = faker.backToTheFuture().quote() + faker.number().digits(3);
+        TaskDto newTask = testHelper.createNewTask(
+                taskName,
+                taskDescription,
+                statusId,
+                executorId,
+                labelIdSet,
+                requestWithJWTToken,
+                apiTaskUrl);
+
+        // create task with the same name
+        TaskOperationDto taskWithSameName = new TaskOperationDto(
+                taskName,
+                faker.backToTheFuture().quote() + faker.number().digits(3),
+                statusId,
+                null,
+                executorId,
+                labelIdSet);
+
+        String taskJson = OBJECT_MAPPER.writeValueAsString(taskWithSameName);
+        HttpEntity<String> requestWithBodyAndToken = new HttpEntity<>(taskJson, requestWithJWTToken.getHeaders());
+        ResponseEntity<TaskDto> response = restTemplate.exchange(apiTaskUrl, HttpMethod.POST,
+                requestWithBodyAndToken, TaskDto.class);
+
+        // check HTTP 422 Unprocessable Entity
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
+    }
 
     @Test
     void shouldThrowLabelAssociatedWithTaskExceptionWhenLabelIsAssociatedWithTask() {
@@ -461,6 +461,45 @@ class TaskControllerTest {
                 requestWithJWTToken, StatusDto.class);
 
         // check HTTP 409 Conflict
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+    }
+
+    @Test
+    void shouldThrowUserAssociatedWithTaskExceptionWhenUserIsAssociatedWithTask() {
+        // user registration
+        String password = faker.internet().password();
+        UserDto registerUser = testHelper.registerUser(
+                faker.name().firstName(),
+                faker.name().lastName(),
+                faker.internet().emailAddress(),
+                password,
+                apiUserUrl);
+
+        // user login
+        HttpEntity<String> requestWithJWTToken = testHelper.loginUser(
+                registerUser.getEmail(),
+                password,
+                apiUserLoginUrl);
+
+        // create task associated with user
+        testHelper.createNewTask(
+                faker.pokemon().name() + faker.number().digits(3),
+                faker.backToTheFuture().quote() + faker.number().digits(3),
+                statusId,
+                executorId,
+                labelIdSet,
+                requestWithJWTToken,
+                apiTaskUrl);
+
+        // delete the user
+        String url = UriComponentsBuilder
+                .fromHttpUrl(apiUserUrl + "/{id}")
+                .buildAndExpand(registerUser.getId())
+                .toUriString();
+        ResponseEntity<UserDto> response = restTemplate.exchange(url, HttpMethod.DELETE,
+                requestWithJWTToken, UserDto.class);
+
+        // expect HTTP 409 Conflict
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
     }
 }

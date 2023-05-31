@@ -15,4 +15,5 @@
     <include file="db/changelog/changeset/008_create_labels_table.xml"/>
     <include file="db/changelog/changeset/009_update_tasks_table.xml"/>
     <include file="db/changelog/changeset/010_update_tasks_table.xml"/>
+    <include file="db/changelog/changeset/011_update_tasks_table.xml"/>
 </databaseChangeLog>

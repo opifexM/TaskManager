@@ -40,28 +40,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UserControllerTest {
 
-    private String apiUserUrl;
-    private String apiUserLoginUrl;
-
-    @LocalServerPort
-    private int port;
-
     public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
     private static final Faker faker = new Faker();
-
-    @Autowired
-    private TestRestTemplate restTemplate;
-
-    @Autowired
-    private TestHelper testHelper;
-
     private static final PostgreSQLContainer<?> postgres
             = new PostgreSQLContainer<>(DockerImageName.parse("postgres:latest"));
 
     static {
         postgres.start();
     }
+
+    private String apiUserUrl;
+    private String apiUserLoginUrl;
+    @LocalServerPort
+    private int port;
+    @Autowired
+    private TestRestTemplate restTemplate;
+    @Autowired
+    private TestHelper testHelper;
 
     @DynamicPropertySource
     static void registerPgProperties(DynamicPropertyRegistry registry) {
@@ -70,13 +65,51 @@ class UserControllerTest {
         registry.add("spring.datasource.password", postgres::getPassword);
     }
 
+    private static Stream<UserOperationDto> provideInvalidUserOperationDto() {
+        // Invalid email
+        UserOperationDto userWithInvalidEmail =
+                new UserOperationDto(faker.name().firstName(), faker.name().lastName(),
+                        "invalid_email", faker.internet().password());
+
+        // Missing first name
+        UserOperationDto userWithMissingFirstName =
+                new UserOperationDto(null, faker.name().lastName(),
+                        faker.internet().emailAddress(), faker.internet().password());
+
+        // Invalid password
+        UserOperationDto userWithInvalidPassword =
+                new UserOperationDto(faker.name().firstName(), faker.name().lastName(),
+                        faker.internet().emailAddress(), "12"); // password less than 3 characters
+
+        // First name exceeds max length
+        UserOperationDto userWithLongFirstName =
+                new UserOperationDto(faker.lorem().fixedString(51), faker.name().lastName(),
+                        faker.internet().emailAddress(), faker.internet().password());
+
+        // Last name exceeds max length
+        UserOperationDto userWithLongLastName =
+                new UserOperationDto(faker.name().firstName(), faker.lorem().fixedString(51),
+                        faker.internet().emailAddress(), faker.internet().password());
+
+        // Email exceeds max length
+        UserOperationDto userWithLongEmail =
+                new UserOperationDto(faker.name().firstName(), faker.name().lastName(),
+                        faker.lorem().fixedString(101), faker.internet().password());
+
+        // Password exceeds max length
+        UserOperationDto userWithLongPassword =
+                new UserOperationDto(faker.name().firstName(), faker.name().lastName(),
+                        faker.internet().emailAddress(), faker.lorem().fixedString(101));
+
+        return Stream.of(userWithInvalidEmail, userWithMissingFirstName, userWithInvalidPassword,
+                userWithLongFirstName, userWithLongLastName, userWithLongEmail, userWithLongPassword);
+    }
+
     @BeforeAll
     void setupTest() {
         apiUserUrl = TestHelper.BASE_URL + port + TestHelper.API_USERS;
         apiUserLoginUrl = TestHelper.BASE_URL + port + TestHelper.API_LOGIN;
     }
-
-
 
     @Test
     void shouldRegisterSuccessfully() {
@@ -208,13 +241,11 @@ class UserControllerTest {
 
     @ParameterizedTest
     @MethodSource("provideInvalidUserOperationDto")
-    void shouldReturnBadRequestWhenInvalidUserDataProvided(UserOperationDto userForRegistration) {
+    void shouldReturnBadRequestWhenInvalidUserDataProvided(UserOperationDto userForRegistration)
+            throws JsonProcessingException {
         String userJson;
-        try {
-            userJson = OBJECT_MAPPER.writeValueAsString(userForRegistration);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+
+        userJson = OBJECT_MAPPER.writeValueAsString(userForRegistration);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> request = new HttpEntity<>(userJson, headers);
@@ -223,46 +254,6 @@ class UserControllerTest {
         ResponseEntity<UserDto> response = restTemplate.exchange(apiUserUrl, HttpMethod.POST, request, UserDto.class);
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-    }
-
-    private static Stream<UserOperationDto> provideInvalidUserOperationDto() {
-        // Invalid email
-        UserOperationDto userWithInvalidEmail =
-                new UserOperationDto(faker.name().firstName(), faker.name().lastName(),
-                        "invalid_email", faker.internet().password());
-
-        // Missing first name
-        UserOperationDto userWithMissingFirstName =
-                new UserOperationDto(null, faker.name().lastName(),
-                        faker.internet().emailAddress(), faker.internet().password());
-
-        // Invalid password
-        UserOperationDto userWithInvalidPassword =
-                new UserOperationDto(faker.name().firstName(), faker.name().lastName(),
-                        faker.internet().emailAddress(), "12"); // password less than 3 characters
-
-        // First name exceeds max length
-        UserOperationDto userWithLongFirstName =
-                new UserOperationDto(faker.lorem().fixedString(51), faker.name().lastName(),
-                        faker.internet().emailAddress(), faker.internet().password());
-
-        // Last name exceeds max length
-        UserOperationDto userWithLongLastName =
-                new UserOperationDto(faker.name().firstName(), faker.lorem().fixedString(51),
-                        faker.internet().emailAddress(), faker.internet().password());
-
-        // Email exceeds max length
-        UserOperationDto userWithLongEmail =
-                new UserOperationDto(faker.name().firstName(), faker.name().lastName(),
-                        faker.lorem().fixedString(101), faker.internet().password());
-
-        // Password exceeds max length
-        UserOperationDto userWithLongPassword =
-                new UserOperationDto(faker.name().firstName(), faker.name().lastName(),
-                        faker.internet().emailAddress(), faker.lorem().fixedString(101));
-
-        return Stream.of(userWithInvalidEmail, userWithMissingFirstName, userWithInvalidPassword,
-                        userWithLongFirstName, userWithLongLastName, userWithLongEmail, userWithLongPassword);
     }
 
     @Test
@@ -377,5 +368,36 @@ class UserControllerTest {
 
         response = restTemplate.exchange(url, HttpMethod.GET, requestWithJWTToken, UserDto.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void shouldThrowDuplicateUserExceptionWhenUserEmailAlreadyExists() throws JsonProcessingException {
+        // user registration
+        String emailAddress = faker.internet().emailAddress();
+        testHelper.registerUser(
+                faker.name().firstName(),
+                faker.name().lastName(),
+                emailAddress,
+                faker.internet().password(),
+                apiUserUrl
+        );
+
+        // create another user with the same name
+        UserOperationDto duplicateUser = new UserOperationDto(
+                faker.name().firstName(),
+                faker.name().lastName(),
+                emailAddress,
+                faker.internet().password()
+        );
+
+        String userJson = OBJECT_MAPPER.writeValueAsString(duplicateUser);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(userJson, headers);
+        assertThat(request).isNotNull();
+
+        // check DuplicateUserException
+        ResponseEntity<UserDto> response = restTemplate.exchange(apiUserUrl, HttpMethod.POST, request, UserDto.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
     }
 }

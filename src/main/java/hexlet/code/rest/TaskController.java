@@ -70,6 +70,7 @@ public class TaskController {
 
     @PostMapping("")
     @Operation(summary = "Create a new task", description = "Creates a new task")
+    @Transactional
     public TaskDto createTask(
             @Valid @RequestBody @Parameter(description = "Task object") final TaskOperationDto taskOperationDto) {
         log.info("Creating a new task: {}", taskOperationDto);
