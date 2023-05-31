@@ -35,14 +35,10 @@ spring:
   config:
     activate:
       on-profile: dev
-#  datasource:
-#    username:
-#    password:
-#    url: jdbc:h2:./database
   datasource:
-    url: jdbc:postgresql://localhost:5432/task-manager
-    username: postgres
-    password: postgres
+    username:
+    password:
+    url: jdbc:h2:./database
 
 ---
 spring:
