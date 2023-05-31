@@ -31,6 +31,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -279,8 +280,7 @@ class TaskControllerTest {
                 });
 
         // update task
-
-        // create new executor
+        // - create new executor
         UserDto newUser = testHelper.registerUser(
                 faker.name().firstName(),
                 faker.name().lastName(),
@@ -289,14 +289,14 @@ class TaskControllerTest {
                 apiUserUrl);
         Long newExecutorId = newUser.getId();
 
-        // create new status
+        // - create new status
         StatusDto newStatus = testHelper.createNewStatus(
                 faker.animal().name() + faker.number().digits(3),
                 requestWithJWTToken,
                 apiStatusUrl);
         Long newStatusId = newStatus.getId();
 
-        // create new label set
+        // - create new label set
         Set<Long> newLabelIdSet = testHelper.createLabelIdSet(5, requestWithJWTToken, apiLabelUrl);
 
         TaskOperationDto taskForUpdate = new TaskOperationDto(
@@ -323,43 +323,144 @@ class TaskControllerTest {
                     assertThat(t.getTaskStatus().getId()).isEqualTo(newStatusId);
                     assertThat(t.getLabels().stream().map(LabelDto::getId).collect(Collectors.toSet()))
                             .containsExactlyInAnyOrderElementsOf(newLabelIdSet);
-        });
+                });
+    }
+
+    @Test
+    void shouldDeleteStatusSuccessfullyAndReturnNotFoundAfterDeletion() {
+        // create task
+        TaskDto newTask = testHelper.createNewTask(
+                faker.pokemon().name() + faker.number().digits(3),
+                faker.backToTheFuture().quote() + faker.number().digits(3),
+                statusId,
+                executorId,
+                labelIdSet,
+                requestWithJWTToken,
+                apiTaskUrl);
+
+        // check task
+        Long taskId = newTask.getId();
+        assertThat(taskId)
+                .isNotNull()
+                .isPositive();
+        String url = UriComponentsBuilder
+                .fromHttpUrl(apiTaskUrl + "/{id}")
+                .buildAndExpand(taskId)
+                .toUriString();
+
+        ResponseEntity<TaskDto> response = restTemplate.exchange(url, HttpMethod.GET,
+                requestWithJWTToken, TaskDto.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        TaskDto currentTask = response.getBody();
+
+        assertThat(currentTask)
+                .isNotNull()
+                .satisfies(t -> {
+                    assertThat(t.getId()).isPositive();
+                    assertThat(t.getId()).isEqualTo(newTask.getId());
+                    assertThat(t.getName()).isEqualTo(newTask.getName());
+                    assertThat(t.getDescription()).isEqualTo(newTask.getDescription());
+                    assertThat(t.getExecutor().getId()).isEqualTo(executorId);
+                    assertThat(t.getTaskStatus().getId()).isEqualTo(statusId);
+                    assertThat(t.getLabels().stream().map(LabelDto::getId).collect(Collectors.toSet()))
+                            .containsExactlyInAnyOrderElementsOf(labelIdSet);
+                });
+
+        // delete task
+        response = restTemplate.exchange(url, HttpMethod.DELETE, requestWithJWTToken, TaskDto.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+
+        response = restTemplate.exchange(url, HttpMethod.GET, requestWithJWTToken, TaskDto.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
     // @Test
-    // void shouldDeleteStatusSuccessfullyAndReturnNotFoundAfterDeletion() {
-    //     // registration + login
-    //     HttpEntity<String> requestWithJWTToken = testHelper.registerAndLoginReturnJWTToken(apiUserUrl, apiUserLoginUrl);
-    //
-    //     // create status
-    //     LabelDto newStatus = testHelper.createNewLabel(
-    //             faker.programmingLanguage().name() + faker.number().digits(3),
+    // void shouldThrowDuplicateTaskExceptionWhenTaskWithSameNameAlreadyExists() throws JsonProcessingException {
+    //     // create task
+    //     String taskName = faker.pokemon().name() + faker.number().digits(3);
+    //     String taskDescription = faker.backToTheFuture().quote() + faker.number().digits(3);
+    //     TaskDto newTask = testHelper.createNewTask(
+    //             taskName,
+    //             taskDescription,
+    //             statusId,
+    //             executorId,
+    //             labelIdSet,
     //             requestWithJWTToken,
     //             apiTaskUrl);
     //
-    //     // check status
-    //     Long statusId = newStatus.getId();
-    //     assertThat(statusId).isNotNull().isPositive();
-    //     String url = UriComponentsBuilder
-    //             .fromHttpUrl(apiTaskUrl + "/{id}")
-    //             .buildAndExpand(statusId)
-    //             .toUriString();
+    //     // create task with the same name
+    //     TaskOperationDto taskWithSameName = new TaskOperationDto(
+    //             taskName,
+    //             faker.backToTheFuture().quote() + faker.number().digits(3),
+    //             statusId,
+    //             null,
+    //             executorId,
+    //             labelIdSet);
     //
-    //     ResponseEntity<StatusDto> response = restTemplate.exchange(url, HttpMethod.GET,
-    //             requestWithJWTToken, StatusDto.class);
-    //     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    //     StatusDto currentStatus = response.getBody();
+    //     String taskJson = OBJECT_MAPPER.writeValueAsString(taskWithSameName);
+    //     HttpEntity<String> requestWithBodyAndToken = new HttpEntity<>(taskJson, requestWithJWTToken.getHeaders());
+    //     ResponseEntity<TaskDto> response = restTemplate.exchange(apiTaskUrl, HttpMethod.POST,
+    //             requestWithBodyAndToken, TaskDto.class);
     //
-    //     assertThat(currentStatus).isNotNull().satisfies(s -> {
-    //         assertThat(s.getId()).isEqualTo(statusId);
-    //         assertThat(s.getName()).isEqualTo(newStatus.getName());
-    //     });
-    //
-    //     // delete status
-    //     response = restTemplate.exchange(url, HttpMethod.DELETE, requestWithJWTToken, StatusDto.class);
-    //     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-    //
-    //     response = restTemplate.exchange(url, HttpMethod.GET, requestWithJWTToken, StatusDto.class);
-    //     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    //     // check HTTP 422 Unprocessable Entity
+    //     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
     // }
+
+    @Test
+    void shouldThrowLabelAssociatedWithTaskExceptionWhenLabelIsAssociatedWithTask() {
+        // create label
+        String labelName = faker.color().name() + faker.number().digits(3);
+        LabelDto newLabel = testHelper.createNewLabel(labelName, requestWithJWTToken, apiLabelUrl);
+
+        // create task associated with the label
+        Set<Long> labelIds = new HashSet<>();
+        labelIds.add(newLabel.getId());
+        testHelper.createNewTask(
+                faker.pokemon().name() + faker.number().digits(3),
+                faker.backToTheFuture().quote() + faker.number().digits(3),
+                statusId,
+                executorId,
+                labelIds,
+                requestWithJWTToken,
+                apiTaskUrl);
+
+        // delete label
+        String url = UriComponentsBuilder
+                .fromHttpUrl(apiLabelUrl + "/{id}")
+                .buildAndExpand(newLabel.getId())
+                .toUriString();
+        ResponseEntity<LabelDto> response = restTemplate.exchange(url, HttpMethod.DELETE,
+                requestWithJWTToken, LabelDto.class);
+
+        // check HTTP 409 Conflict
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+    }
+
+    @Test
+    void shouldThrowStatusAssociatedWithTaskExceptionWhenStatusIsAssociatedWithTask() {
+        // create status
+        String statusName = faker.animal().name() + faker.number().digits(3);
+        StatusDto newStatus = testHelper.createNewStatus(statusName, requestWithJWTToken, apiStatusUrl);
+
+        // create task associated with the status
+        testHelper.createNewTask(
+                faker.pokemon().name() + faker.number().digits(3),
+                faker.backToTheFuture().quote() + faker.number().digits(3),
+                newStatus.getId(),
+                executorId,
+                labelIdSet,
+                requestWithJWTToken,
+                apiTaskUrl);
+
+        // delete status
+        String url = UriComponentsBuilder
+                .fromHttpUrl(apiStatusUrl + "/{id}")
+                .buildAndExpand(newStatus.getId())
+                .toUriString();
+        ResponseEntity<StatusDto> response = restTemplate.exchange(url, HttpMethod.DELETE,
+                requestWithJWTToken, StatusDto.class);
+
+        // check HTTP 409 Conflict
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+    }
 }

@@ -257,4 +257,22 @@ class LabelControllerTest {
         response = restTemplate.exchange(url, HttpMethod.GET, requestWithJWTToken, LabelDto.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
+
+    @Test
+    void shouldThrowDuplicateLabelExceptionWhenLabelNameAlreadyExists() throws JsonProcessingException {
+        // create label
+        String labelName = faker.color().name() + faker.number().digits(3);
+        testHelper.createNewLabel(labelName, requestWithJWTToken, apiLabelUrl);
+
+        // create another label with the same name
+        LabelOperationDto duplicateLabel = new LabelOperationDto(labelName);
+        String duplicateLabelJson = OBJECT_MAPPER.writeValueAsString(duplicateLabel);
+        HttpEntity<String> requestWithBodyAndToken =
+                new HttpEntity<>(duplicateLabelJson, requestWithJWTToken.getHeaders());
+
+        // check DuplicateLabelException
+        ResponseEntity<LabelDto> response = restTemplate.exchange(apiLabelUrl, HttpMethod.POST,
+                requestWithBodyAndToken, LabelDto.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
+    }
 }

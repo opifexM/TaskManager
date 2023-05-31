@@ -253,4 +253,22 @@ class StatusControllerTest {
         response = restTemplate.exchange(url, HttpMethod.GET, requestWithJWTToken, StatusDto.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
+
+    @Test
+    void shouldThrowDuplicateStatusExceptionWhenLabelNameAlreadyExists() throws JsonProcessingException {
+        // create status
+        String statusName = faker.animal().name() + faker.number().digits(3);
+        testHelper.createNewStatus(statusName, requestWithJWTToken, apiStatusUrl);
+
+        // create another status with the same name
+        StatusOperationDto duplicateLabel = new StatusOperationDto(statusName);
+        String duplicateStatusJson = OBJECT_MAPPER.writeValueAsString(duplicateLabel);
+        HttpEntity<String> requestWithBodyAndToken =
+                new HttpEntity<>(duplicateStatusJson, requestWithJWTToken.getHeaders());
+
+        // check DuplicateLabelException
+        ResponseEntity<StatusDto> response = restTemplate.exchange(apiStatusUrl, HttpMethod.POST,
+                requestWithBodyAndToken, StatusDto.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
+    }
 }
