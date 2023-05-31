@@ -1,2 +1,7 @@
 exclude_patterns:
   - "frontend/**"
+  - "src/test/**"
+  - "src/main/java/hexlet/code/domain/label/LabelMapper.java"
+  - "src/main/java/hexlet/code/domain/status/StatusMapper.java"
+  - "src/main/java/hexlet/code/domain/task/TaskMapper.java"
+  - "src/main/java/hexlet/code/domain/user/UserMapper.java"
