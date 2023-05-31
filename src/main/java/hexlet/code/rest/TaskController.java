@@ -102,7 +102,7 @@ public class TaskController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete task by ID", description = "Deletes a task by ID")
-    @PreAuthorize("@userSecurityService.isOwner(#id)")
+    @PreAuthorize("@userSecurityService.isTaskOwner(#id)")
     public void deleteTask(@PathVariable("id") @Parameter(description = "Task ID") final long id) {
         log.info("Deleting task with ID: {}", id);
         taskService.deleteById(id);
