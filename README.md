@@ -20,7 +20,7 @@ and uses a stack of advanced technologies such as Liquibase, Testcontainers, Pos
 The project uses various dependencies managed by Gradle. Key dependencies include:
 
 -   Spring Boot and its various starters (web, data JPA, actuator, security)
--   Spring Security Crypto
+-   Spring Security Crypto Argon2
 -   Bouncy Castle for Java cryptography
 -   JSON Web Tokens (JJWT)
 -   PostgreSQL and H2 Database drivers
