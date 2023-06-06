@@ -63,8 +63,10 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                     credentials.getEmail(), credentials.getPassword(), Collections.emptyList());
+
+            log.info("Try to Authentication for user: {}", credentials.getEmail());
             Authentication authentication = getAuthenticationManager().authenticate(authToken);
-            log.info("Authentication attempt for user {}", credentials.getEmail());
+            log.info("Authentication attempt for user: {}", credentials.getEmail());
             return authentication;
         } catch (IOException e) {
             log.error("Failed to parse authentication request body", e);

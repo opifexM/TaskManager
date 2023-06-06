@@ -28,7 +28,7 @@ public class TaskServiceImpl implements TaskService {
 
     // todo Querydsl
     // @Override
-    // public List<Task> findAll(Optional<Long> taskStatusId, Optional<Long> executorId,
+    // public List<Task> findAll2(Optional<Long> taskStatusId, Optional<Long> executorId,
     //                           Optional<Long> labelsId, Optional<Long> authorId) {
     //     log.info("Received filter parameters: taskStatusId={}, executorId={}, labelsId={}, authorId={}",
     //             taskStatusId, executorId, labelsId, authorId);
