@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
         newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
         User savedUser = userRepository.save(newUser);
-        savedUser.setPassword(null);
+        // savedUser.setPassword(null);
         log.info("Successfully saved new user: {}", savedUser);
         return savedUser;
     }
@@ -73,7 +73,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                     log.error(message);
                     return new UserNotFoundException(message);
                 });
-        savedUser.setPassword(null);
+        // savedUser.setPassword(null);
         log.info("Successfully updated user {}", savedUser);
         return savedUser;
     }

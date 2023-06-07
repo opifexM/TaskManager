@@ -115,7 +115,7 @@ public class TestHelper {
         ResponseEntity<LabelDto> response = restTemplate.exchange(apiLabelsUrl, HttpMethod.POST,
                 requestWithBodyAndToken, LabelDto.class);
         assertThat(response).isNotNull();
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         return response.getBody();
     }
 
@@ -132,7 +132,7 @@ public class TestHelper {
         ResponseEntity<StatusDto> response = restTemplate.exchange(apiStatusUrl, HttpMethod.POST,
                 requestWithBodyAndToken, StatusDto.class);
         assertThat(response).isNotNull();
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         return response.getBody();
     }
 
@@ -151,7 +151,7 @@ public class TestHelper {
         ResponseEntity<TaskDto> response = restTemplate.exchange(apiTaskUrl, HttpMethod.POST,
                 requestWithBodyAndToken, TaskDto.class);
         assertThat(response).isNotNull();
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         return response.getBody();
     }
 

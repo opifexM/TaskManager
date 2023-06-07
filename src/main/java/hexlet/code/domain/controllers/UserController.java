@@ -1,4 +1,4 @@
-package hexlet.code.rest;
+package hexlet.code.domain.controllers;
 
 import hexlet.code.domain.user.User;
 import hexlet.code.domain.user.UserDto;

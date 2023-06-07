@@ -1,4 +1,4 @@
-package hexlet.code.rest;
+package hexlet.code.domain.controllers;
 
 import hexlet.code.domain.label.Label;
 import hexlet.code.domain.label.LabelDto;
@@ -49,6 +49,7 @@ public class LabelController {
     }
 
     @PostMapping("")
+    @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a new label", description = "Creates a new label")
     public LabelDto createLabel(
             @Valid @RequestBody @Parameter(description = "Label object") final LabelOperationDto labelOperationDto) {
@@ -72,7 +73,6 @@ public class LabelController {
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete label by ID", description = "Deletes a label by ID")
     public void deleteLabel(@PathVariable("id") @Parameter(description = "Label ID") final long id) {
         log.info("Deleting label with ID: {}", id);

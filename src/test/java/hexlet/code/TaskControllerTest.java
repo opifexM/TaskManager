@@ -369,7 +369,7 @@ class TaskControllerTest {
 
         // delete task
         response = restTemplate.exchange(url, HttpMethod.DELETE, requestWithJWTToken, TaskDto.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         response = restTemplate.exchange(url, HttpMethod.GET, requestWithJWTToken, TaskDto.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);

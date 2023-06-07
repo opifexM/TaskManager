@@ -3,8 +3,7 @@ server:
 
 base-url: /api
 jwt:
-  # min 32 symbols
-  secret: SecretKeySecretKeySecretKeySecretKeySecretKeySecretKeySecretKeySecretKeySecretKeySecretKeySecretKey
+  secret: DevSecretKeySecretKeySecretKeySecretKeySecretKeySecretKeySecretKeySecretKey
   expiration: 3600000
 
 rollbar:
@@ -29,23 +28,3 @@ spring:
 springdoc:
   swagger-ui:
     path: /swagger.html
-
----
-spring:
-  config:
-    activate:
-      on-profile: dev
-  datasource:
-    username:
-    password:
-    url: jdbc:h2:./database
-
----
-spring:
-  config:
-    activate:
-      on-profile: prod
-  datasource:
-    url: ${DATABASE_URL_SPRING}
-    username: ${DATABASE_USER}
-    password: ${DATABASE_PASSWORD}

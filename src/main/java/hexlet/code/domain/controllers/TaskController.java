@@ -1,4 +1,4 @@
-package hexlet.code.rest;
+package hexlet.code.domain.controllers;
 
 import hexlet.code.domain.task.Task;
 import hexlet.code.domain.task.TaskDto;
@@ -69,6 +69,7 @@ public class TaskController {
     }
 
     @PostMapping("")
+    @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a new task", description = "Creates a new task")
     @Transactional
     public TaskDto createTask(
@@ -101,7 +102,6 @@ public class TaskController {
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete task by ID", description = "Deletes a task by ID")
     @PreAuthorize("@userSecurityService.isTaskOwner(#id)")
     public void deleteTask(@PathVariable("id") @Parameter(description = "Task ID") final long id) {

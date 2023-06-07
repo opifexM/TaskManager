@@ -1,0 +1,14 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: ${DATABASE_URL_SPRING}
+    username: ${DATABASE_USER}
+    password: ${DATABASE_PASSWORD}
+  jwt:
+    # min 32 symbols
+    secret: ${JWT_SECRET}
+    expiration: ${JWT_EXPIRATION}
+  rollbar:
+    token: ${ROLLBAR_TOKEN}

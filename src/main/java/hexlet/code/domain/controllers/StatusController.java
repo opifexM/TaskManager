@@ -1,4 +1,4 @@
-package hexlet.code.rest;
+package hexlet.code.domain.controllers;
 
 import hexlet.code.domain.status.Status;
 import hexlet.code.domain.status.StatusDto;
@@ -49,6 +49,7 @@ public class StatusController {
     }
 
     @PostMapping("")
+    @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a new status", description = "Creates a new status")
     public StatusDto createStatus(
             @Valid @RequestBody @Parameter(description = "Status object") final StatusOperationDto statusOperationDto) {
@@ -72,7 +73,6 @@ public class StatusController {
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete status by ID", description = "Deletes a status by ID")
     public void deleteStatus(@PathVariable("id") @Parameter(description = "Status ID") final long id) {
         log.info("Deleting status with ID: {}", id);

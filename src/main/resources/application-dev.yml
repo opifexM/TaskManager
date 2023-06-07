@@ -1,0 +1,14 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:h2:./database
+    username:
+    password:
+  jwt:
+    # min 32 symbols
+    secret: DevSecretKeySecretKeySecretKeySecretKeySecretKeySecretKeySecretKeySecretKey
+    expiration: 3600000
+  rollbar:
+    token: 6b44f0336d5c49be901d487c25dfb320

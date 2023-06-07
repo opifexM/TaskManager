@@ -252,7 +252,7 @@ class LabelControllerTest {
 
         // delete status
         response = restTemplate.exchange(url, HttpMethod.DELETE, requestWithJWTToken, LabelDto.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         response = restTemplate.exchange(url, HttpMethod.GET, requestWithJWTToken, LabelDto.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
