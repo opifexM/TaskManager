@@ -1,10 +1,5 @@
-package hexlet.code.domain.controllers;
+package hexlet.code.domain.status;
 
-import hexlet.code.domain.status.Status;
-import hexlet.code.domain.status.StatusDto;
-import hexlet.code.domain.status.StatusMapper;
-import hexlet.code.domain.status.StatusOperationDto;
-import hexlet.code.domain.status.StatusService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

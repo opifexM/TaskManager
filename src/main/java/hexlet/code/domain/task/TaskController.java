@@ -1,10 +1,5 @@
-package hexlet.code.domain.controllers;
+package hexlet.code.domain.task;
 
-import hexlet.code.domain.task.Task;
-import hexlet.code.domain.task.TaskDto;
-import hexlet.code.domain.task.TaskMapper;
-import hexlet.code.domain.task.TaskOperationDto;
-import hexlet.code.domain.task.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

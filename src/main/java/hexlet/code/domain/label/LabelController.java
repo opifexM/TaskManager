@@ -1,10 +1,5 @@
-package hexlet.code.domain.controllers;
+package hexlet.code.domain.label;
 
-import hexlet.code.domain.label.Label;
-import hexlet.code.domain.label.LabelDto;
-import hexlet.code.domain.label.LabelMapper;
-import hexlet.code.domain.label.LabelOperationDto;
-import hexlet.code.domain.label.LabelService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

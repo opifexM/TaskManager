@@ -1,10 +1,5 @@
-package hexlet.code.domain.controllers;
+package hexlet.code.domain.user;
 
-import hexlet.code.domain.user.User;
-import hexlet.code.domain.user.UserDto;
-import hexlet.code.domain.user.UserMapper;
-import hexlet.code.domain.user.UserOperationDto;
-import hexlet.code.domain.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
