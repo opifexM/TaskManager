@@ -52,7 +52,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
         newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
         User savedUser = userRepository.save(newUser);
-        // savedUser.setPassword(null);
         log.info("Successfully saved new user: {}", savedUser);
         return savedUser;
     }
@@ -60,20 +59,17 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public User updateById(final User updatedUser, final long id) {
         log.info("Updating user with ID: {} with data: {}", id, updatedUser);
-        User savedUser = userRepository.findById(id)
-                .map(user -> {
-                    user.setFirstName(updatedUser.getFirstName());
-                    user.setLastName(updatedUser.getLastName());
-                    user.setEmail(updatedUser.getEmail());
-                    user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
-                    return userRepository.save(user);
-                })
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> {
                     String message = String.format("Failed to update user. User with ID %d not found.", id);
                     log.error(message);
                     return new UserNotFoundException(message);
                 });
-        // savedUser.setPassword(null);
+        user.setFirstName(updatedUser.getFirstName());
+        user.setLastName(updatedUser.getLastName());
+        user.setEmail(updatedUser.getEmail());
+        user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+        User savedUser = userRepository.save(user);
         log.info("Successfully updated user {}", savedUser);
         return savedUser;
     }
