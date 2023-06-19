@@ -26,27 +26,6 @@ public class TaskServiceImpl implements TaskService {
     private final UserService userService;
     private final LabelService labelService;
 
-    // todo Querydsl
-    // @Override
-    // public List<Task> findAll2(Optional<Long> taskStatusId, Optional<Long> executorId,
-    //                           Optional<Long> labelsId, Optional<Long> authorId) {
-    //     log.info("Received filter parameters: taskStatusId={}, executorId={}, labelsId={}, authorId={}",
-    //             taskStatusId, executorId, labelsId, authorId);
-    //
-    //     QTask task = QTask.task;
-    //     BooleanBuilder where = new BooleanBuilder();
-    //     taskStatusId.ifPresent(id -> where.and(task.taskStatus.id.eq(id)));
-    //     executorId.ifPresent(id -> where.and(task.executor.id.eq(id)));
-    //     authorId.ifPresent(id -> where.and(task.author.id.eq(id)));
-    //     labelsId.ifPresent(id -> where.and(task.labels.any().id.eq(id)));
-    //
-    //     log.info("Constructed filter condition: {}", where.toString());
-    //     List<Task> tasks = (List<Task>) taskRepository.findAll(where);
-    //
-    //     log.info("Found {} tasks with the provided filter parameters", tasks.size());
-    //     return tasks;
-    // }
-
     @Override
     public List<Task> findAll(Optional<Long> taskStatusId, Optional<Long> executorId,
                               Optional<Long> labelsId, Optional<Long> authorId) {
