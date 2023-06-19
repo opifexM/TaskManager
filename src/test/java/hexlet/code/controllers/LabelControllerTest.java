@@ -40,6 +40,7 @@ class LabelControllerTest {
 
     public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final Faker faker = new Faker();
+
     private static final PostgreSQLContainer<?> postgres
             = new PostgreSQLContainer<>(DockerImageName.parse("postgres:latest"));
 
