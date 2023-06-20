@@ -78,12 +78,12 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-test {
-    testLogging {
-        showStandardStreams = true
-        events "passed", "skipped", "failed"
-    }
-}
+//test {
+//    testLogging {
+//        showStandardStreams = true
+//        events "passed", "skipped", "failed"
+//    }
+//}
 
 jacocoTestReport {
     reports {
