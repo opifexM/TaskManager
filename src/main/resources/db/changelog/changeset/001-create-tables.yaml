@@ -1,0 +1,272 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1688221522186-1
+      author: opifex (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createSequence:
+            incrementBy: 50
+            sequenceName: labels_seq
+            startValue: 1
+  - changeSet:
+      id: 1688221522186-2
+      author: opifex (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createSequence:
+            incrementBy: 50
+            sequenceName: statuses_seq
+            startValue: 1
+  - changeSet:
+      id: 1688221522186-3
+      author: opifex (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createSequence:
+            incrementBy: 50
+            sequenceName: tasks_seq
+            startValue: 1
+  - changeSet:
+      id: 1688221522186-4
+      author: opifex (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createSequence:
+            incrementBy: 50
+            sequenceName: users_seq
+            startValue: 1
+  - changeSet:
+      id: 1688221522186-5
+      author: opifex (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_labels
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(50)
+              - column:
+                  name: created_at
+                  type: DATETIME
+            tableName: labels
+  - changeSet:
+      id: 1688221522186-6
+      author: opifex (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_statuses
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(50)
+              - column:
+                  name: created_at
+                  type: DATETIME
+            tableName: statuses
+  - changeSet:
+      id: 1688221522186-7
+      author: opifex (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_tasks
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: description
+                  type: VARCHAR(1000)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: task_status_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: author_id
+                  type: BIGINT
+              - column:
+                  name: executor_id
+                  type: BIGINT
+              - column:
+                  name: created_at
+                  type: DATETIME
+            tableName: tasks
+  - changeSet:
+      id: 1688221522186-8
+      author: opifex (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_tasks_labels
+                  name: labels_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_tasks_labels
+                  name: task_id
+                  type: BIGINT
+            tableName: tasks_labels
+  - changeSet:
+      id: 1688221522186-9
+      author: opifex (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_users
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: first_name
+                  type: VARCHAR(50)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: last_name
+                  type: VARCHAR(50)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: email
+                  type: VARCHAR(100)
+              - column:
+                  name: password
+                  type: VARCHAR(100)
+              - column:
+                  name: created_at
+                  type: DATETIME
+            tableName: users
+  - changeSet:
+      id: 1688221522186-10
+      author: opifex (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: name
+            constraintName: uc_labels_name
+            tableName: labels
+  - changeSet:
+      id: 1688221522186-11
+      author: opifex (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: name
+            constraintName: uc_statuses_name
+            tableName: statuses
+  - changeSet:
+      id: 1688221522186-12
+      author: opifex (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: name
+            constraintName: uc_tasks_name
+            tableName: tasks
+  - changeSet:
+      id: 1688221522186-13
+      author: opifex (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: email
+            constraintName: uc_users_email
+            tableName: users
+  - changeSet:
+      id: 1688221522186-14
+      author: opifex (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: author_id
+            baseTableName: tasks
+            constraintName: FK_TASKS_ON_AUTHOR
+            referencedColumnNames: id
+            referencedTableName: users
+  - changeSet:
+      id: 1688221522186-15
+      author: opifex (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: executor_id
+            baseTableName: tasks
+            constraintName: FK_TASKS_ON_EXECUTOR
+            referencedColumnNames: id
+            referencedTableName: users
+  - changeSet:
+      id: 1688221522186-16
+      author: opifex (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: task_status_id
+            baseTableName: tasks
+            constraintName: FK_TASKS_ON_TASK_STATUS
+            referencedColumnNames: id
+            referencedTableName: statuses
+  - changeSet:
+      id: 1688221522186-17
+      author: opifex (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: labels_id
+            baseTableName: tasks_labels
+            constraintName: fk_taslab_on_label
+            referencedColumnNames: id
+            referencedTableName: labels
+  - changeSet:
+      id: 1688221522186-18
+      author: opifex (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: task_id
+            baseTableName: tasks_labels
+            constraintName: fk_taslab_on_task
+            referencedColumnNames: id
+            referencedTableName: tasks
+
