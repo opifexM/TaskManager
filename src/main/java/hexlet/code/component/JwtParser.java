@@ -23,7 +23,7 @@ import java.util.Optional;
 public class JwtParser {
     private final String jwtSecret;
 
-    public JwtParser(@Value("${jwt.secret}") String jwtSecret) {
+    public JwtParser(@Value("${jwt.secret:DevSecretKeySecretKeySecretKeySecretKeySecretKeySecretKeySecretKeySecretKey}") String jwtSecret) {
         this.jwtSecret = jwtSecret;
     }
 

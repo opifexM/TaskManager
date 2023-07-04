@@ -15,7 +15,7 @@ public class WebConfiguration implements WebMvcConfigurer {
 
     private final String baseUrl;
 
-    public WebConfiguration(@Value("${base-url}: /api") String baseUrl) {
+    public WebConfiguration(@Value("${base-url:/api}") String baseUrl) {
         log.info("Initializing WebConfiguration with baseApiPath: {}", baseUrl);
         this.baseUrl = baseUrl;
     }

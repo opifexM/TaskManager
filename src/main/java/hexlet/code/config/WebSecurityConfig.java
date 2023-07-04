@@ -29,7 +29,7 @@ public class WebSecurityConfig {
 
     private final String baseUrl;
 
-    public WebSecurityConfig(@Value("${base-url: /api}") String baseUrl) {
+    public WebSecurityConfig(@Value("${base-url:/api}") String baseUrl) {
         this.baseUrl = baseUrl;
     }
 
