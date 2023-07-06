@@ -18,7 +18,7 @@ public class RollbarConfig {
 
     private final String activeProfile;
 
-    public RollbarConfig(@Value("${rollbar.token}") String rollbarToken,
+    public RollbarConfig(@Value("${rollbar.token:6b44f0336d5c49be901d487c25dfb320}") String rollbarToken,
                          @Value("${spring.config.activate.on-profile}") String activeProfile) {
         this.rollbarToken = rollbarToken;
         this.activeProfile = activeProfile;
