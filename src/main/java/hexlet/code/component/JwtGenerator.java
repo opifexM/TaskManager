@@ -21,8 +21,12 @@ public class JwtGenerator {
 
     private final int jwtExpiration;
 
-    public JwtGenerator(@Value("${jwt.secret:DevSecretKeySecretKeySecretKeySecretKeySecretKeySecretKeySecretKeySecretKey}") String jwtSecret,
-                        @Value("${jwt.expiration:3600000}") int jwtExpiration) {
+    public JwtGenerator(
+            @Value("${jwt.secret:DevSecretKeySecretKeySecretKeySecretKeySecretKeySecretKeySecretKeySecretKey}")
+            String jwtSecret,
+            @Value("${jwt.expiration:3600000}")
+            int jwtExpiration
+    ) {
         this.jwtSecret = jwtSecret;
         this.jwtExpiration = jwtExpiration;
     }
