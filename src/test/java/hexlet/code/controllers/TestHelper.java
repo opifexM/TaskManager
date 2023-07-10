@@ -159,7 +159,7 @@ public class TestHelper {
         Set<Long> labelIdSet = new HashSet<>();
         for (int i = 0; i < number; i++) {
             LabelDto newLabel = createNewLabel(
-                    FAKER.color().name()+ FAKER.number().digits(3),
+                    FAKER.color().name() + FAKER.number().digits(3),
                     requestWithJWTToken,
                     apiLabelUrl);
             labelIdSet.add(newLabel.getId());

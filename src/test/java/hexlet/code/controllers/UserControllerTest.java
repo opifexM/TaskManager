@@ -232,9 +232,9 @@ class UserControllerTest {
 
         for (User user : registrationUserList) {
             assertThat(returnedUserList.stream().anyMatch(userDto ->
-                    user.getEmail().equals(userDto.getEmail()) &&
-                            user.getFirstName().equals(userDto.getFirstName()) &&
-                            user.getLastName().equals(userDto.getLastName())
+                    user.getEmail().equals(userDto.getEmail())
+                            && user.getFirstName().equals(userDto.getFirstName())
+                            && user.getLastName().equals(userDto.getLastName())
             )).isTrue();
         }
     }

@@ -51,7 +51,7 @@ class StatusControllerTest {
     private String apiUserUrl;
     private String apiStatusUrl;
 
-    HttpEntity<String> requestWithJWTToken;
+    private HttpEntity<String> requestWithJWTToken;
 
     @LocalServerPort
     private int port;

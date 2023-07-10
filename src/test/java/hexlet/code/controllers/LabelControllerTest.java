@@ -48,7 +48,7 @@ class LabelControllerTest {
         POSTGRES.start();
     }
 
-    HttpEntity<String> requestWithJWTToken;
+    private HttpEntity<String> requestWithJWTToken;
     private String apiUserLoginUrl;
     private String apiUserUrl;
     private String apiLabelUrl;
