@@ -41,12 +41,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 class UserControllerTest {
 
     public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    private static final Faker faker = new Faker();
-    private static final PostgreSQLContainer<?> postgres
+    private static final Faker FAKER = new Faker();
+    private static final PostgreSQLContainer<?> POSTGRES
             = new PostgreSQLContainer<>(DockerImageName.parse("postgres:latest"));
 
     static {
-        postgres.start();
+        POSTGRES.start();
     }
 
     private String apiUserUrl;
@@ -60,46 +60,46 @@ class UserControllerTest {
 
     @DynamicPropertySource
     static void registerPgProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
+        registry.add("spring.datasource.url", POSTGRES::getJdbcUrl);
+        registry.add("spring.datasource.username", POSTGRES::getUsername);
+        registry.add("spring.datasource.password", POSTGRES::getPassword);
     }
 
     private static Stream<UserOperationDto> provideInvalidUserOperationDto() {
         // Invalid email
         UserOperationDto userWithInvalidEmail =
-                new UserOperationDto(faker.name().firstName(), faker.name().lastName(),
-                        "invalid_email", faker.internet().password());
+                new UserOperationDto(FAKER.name().firstName(), FAKER.name().lastName(),
+                        "invalid_email", FAKER.internet().password());
 
         // Missing first name
         UserOperationDto userWithMissingFirstName =
-                new UserOperationDto(null, faker.name().lastName(),
-                        faker.internet().emailAddress(), faker.internet().password());
+                new UserOperationDto(null, FAKER.name().lastName(),
+                        FAKER.internet().emailAddress(), FAKER.internet().password());
 
         // Invalid password
         UserOperationDto userWithInvalidPassword =
-                new UserOperationDto(faker.name().firstName(), faker.name().lastName(),
-                        faker.internet().emailAddress(), "12"); // password less than 3 characters
+                new UserOperationDto(FAKER.name().firstName(), FAKER.name().lastName(),
+                        FAKER.internet().emailAddress(), "12"); // password less than 3 characters
 
         // First name exceeds max length
         UserOperationDto userWithLongFirstName =
-                new UserOperationDto(faker.lorem().fixedString(51), faker.name().lastName(),
-                        faker.internet().emailAddress(), faker.internet().password());
+                new UserOperationDto(FAKER.lorem().fixedString(51), FAKER.name().lastName(),
+                        FAKER.internet().emailAddress(), FAKER.internet().password());
 
         // Last name exceeds max length
         UserOperationDto userWithLongLastName =
-                new UserOperationDto(faker.name().firstName(), faker.lorem().fixedString(51),
-                        faker.internet().emailAddress(), faker.internet().password());
+                new UserOperationDto(FAKER.name().firstName(), FAKER.lorem().fixedString(51),
+                        FAKER.internet().emailAddress(), FAKER.internet().password());
 
         // Email exceeds max length
         UserOperationDto userWithLongEmail =
-                new UserOperationDto(faker.name().firstName(), faker.name().lastName(),
-                        faker.lorem().fixedString(101), faker.internet().password());
+                new UserOperationDto(FAKER.name().firstName(), FAKER.name().lastName(),
+                        FAKER.lorem().fixedString(101), FAKER.internet().password());
 
         // Password exceeds max length
         UserOperationDto userWithLongPassword =
-                new UserOperationDto(faker.name().firstName(), faker.name().lastName(),
-                        faker.internet().emailAddress(), faker.lorem().fixedString(101));
+                new UserOperationDto(FAKER.name().firstName(), FAKER.name().lastName(),
+                        FAKER.internet().emailAddress(), FAKER.lorem().fixedString(101));
 
         return Stream.of(userWithInvalidEmail, userWithMissingFirstName, userWithInvalidPassword,
                 userWithLongFirstName, userWithLongLastName, userWithLongEmail, userWithLongPassword);
@@ -114,11 +114,11 @@ class UserControllerTest {
     @Test
     void shouldRegisterSuccessfully() {
         // user registration
-        String password = faker.internet().password();
+        String password = FAKER.internet().password();
         UserDto registerUser = testHelper.registerUser(
-                faker.name().firstName(),
-                faker.name().lastName(),
-                faker.internet().emailAddress(),
+                FAKER.name().firstName(),
+                FAKER.name().lastName(),
+                FAKER.internet().emailAddress(),
                 password,
                 apiUserUrl);
 
@@ -135,11 +135,11 @@ class UserControllerTest {
     @Test
     void shouldLoginUserSuccessfully() {
         // user registration
-        String password = faker.internet().password();
+        String password = FAKER.internet().password();
         UserDto registerUser = testHelper.registerUser(
-                faker.name().firstName(),
-                faker.name().lastName(),
-                faker.internet().emailAddress(),
+                FAKER.name().firstName(),
+                FAKER.name().lastName(),
+                FAKER.internet().emailAddress(),
                 password,
                 apiUserUrl);
 
@@ -154,11 +154,11 @@ class UserControllerTest {
     @Test
     void shouldReturnUserDetailsWhenValidUserIdProvided() {
         // user registration
-        String password = faker.internet().password();
+        String password = FAKER.internet().password();
         UserDto registerUser = testHelper.registerUser(
-                faker.name().firstName(),
-                faker.name().lastName(),
-                faker.internet().emailAddress(),
+                FAKER.name().firstName(),
+                FAKER.name().lastName(),
+                FAKER.internet().emailAddress(),
                 password,
                 apiUserUrl);
 
@@ -199,10 +199,10 @@ class UserControllerTest {
 
         // user registration
         for (int i = 0; i < 10; i++) {
-            String firstName = faker.name().firstName();
-            String lastName = faker.name().lastName();
-            String email = faker.internet().emailAddress();
-            String password = faker.internet().password();
+            String firstName = FAKER.name().firstName();
+            String lastName = FAKER.name().lastName();
+            String email = FAKER.internet().emailAddress();
+            String password = FAKER.internet().password();
             testHelper.registerUser(firstName, lastName, email, password, apiUserUrl);
 
             User user = new User();
@@ -259,11 +259,11 @@ class UserControllerTest {
     @Test
     void shouldUpdateUserDetailsSuccessfully() throws JsonProcessingException {
         // user registration
-        String password = faker.internet().password();
+        String password = FAKER.internet().password();
         UserDto registerUser = testHelper.registerUser(
-                faker.name().firstName(),
-                faker.name().lastName(),
-                faker.internet().emailAddress(),
+                FAKER.name().firstName(),
+                FAKER.name().lastName(),
+                FAKER.internet().emailAddress(),
                 password,
                 apiUserUrl);
 
@@ -299,10 +299,10 @@ class UserControllerTest {
 
         // update user
         UserOperationDto userForUpdate = new UserOperationDto(
-                faker.name().firstName(),
-                faker.name().lastName(),
-                faker.internet().emailAddress(),
-                faker.internet().password());
+                FAKER.name().firstName(),
+                FAKER.name().lastName(),
+                FAKER.internet().emailAddress(),
+                FAKER.internet().password());
 
         String userJson = OBJECT_MAPPER.writeValueAsString(userForUpdate);
         HttpEntity<String> requestWithBodyAndToken = new HttpEntity<>(userJson, requestWithJWTToken.getHeaders());
@@ -324,11 +324,11 @@ class UserControllerTest {
     @Test
     void shouldDeleteUserSuccessfullyAndReturnNotFoundAfterDeletion() {
         // user registration
-        String password = faker.internet().password();
+        String password = FAKER.internet().password();
         UserDto registerUser = testHelper.registerUser(
-                faker.name().firstName(),
-                faker.name().lastName(),
-                faker.internet().emailAddress(),
+                FAKER.name().firstName(),
+                FAKER.name().lastName(),
+                FAKER.internet().emailAddress(),
                 password,
                 apiUserUrl);
 
@@ -373,21 +373,21 @@ class UserControllerTest {
     @Test
     void shouldThrowDuplicateUserExceptionWhenUserEmailAlreadyExists() throws JsonProcessingException {
         // user registration
-        String emailAddress = faker.internet().emailAddress();
+        String emailAddress = FAKER.internet().emailAddress();
         testHelper.registerUser(
-                faker.name().firstName(),
-                faker.name().lastName(),
+                FAKER.name().firstName(),
+                FAKER.name().lastName(),
                 emailAddress,
-                faker.internet().password(),
+                FAKER.internet().password(),
                 apiUserUrl
         );
 
         // create another user with the same name
         UserOperationDto duplicateUser = new UserOperationDto(
-                faker.name().firstName(),
-                faker.name().lastName(),
+                FAKER.name().firstName(),
+                FAKER.name().lastName(),
                 emailAddress,
-                faker.internet().password()
+                FAKER.internet().password()
         );
 
         String userJson = OBJECT_MAPPER.writeValueAsString(duplicateUser);

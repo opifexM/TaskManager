@@ -35,7 +35,7 @@ public class TestHelper {
     static final String API_STATUS = "/api/statuses";
     static final String API_TASKS = "/api/tasks";
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    private static final Faker faker = new Faker();
+    private static final Faker FAKER = new Faker();
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -88,11 +88,11 @@ public class TestHelper {
 
     public HttpEntity<String> registerAndLoginReturnJWTToken(String apiUserUrl, String apiUserLoginUrl) {
         // user registration
-        String password = faker.internet().password();
+        String password = FAKER.internet().password();
         UserDto registerUser = registerUser(
-                faker.name().firstName(),
-                faker.name().lastName(),
-                faker.internet().emailAddress(),
+                FAKER.name().firstName(),
+                FAKER.name().lastName(),
+                FAKER.internet().emailAddress(),
                 password,
                 apiUserUrl);
 
@@ -159,7 +159,7 @@ public class TestHelper {
         Set<Long> labelIdSet = new HashSet<>();
         for (int i = 0; i < number; i++) {
             LabelDto newLabel = createNewLabel(
-                    faker.color().name()+ faker.number().digits(3),
+                    FAKER.color().name()+ FAKER.number().digits(3),
                     requestWithJWTToken,
                     apiLabelUrl);
             labelIdSet.add(newLabel.getId());

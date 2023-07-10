@@ -39,12 +39,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 class StatusControllerTest {
 
     public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    private static final Faker faker = new Faker();
-    private static final PostgreSQLContainer<?> postgres
+    private static final Faker FAKER = new Faker();
+    private static final PostgreSQLContainer<?> POSTGRES
             = new PostgreSQLContainer<>(DockerImageName.parse("postgres:latest"));
 
     static {
-        postgres.start();
+        POSTGRES.start();
     }
 
     private String apiUserLoginUrl;
@@ -62,9 +62,9 @@ class StatusControllerTest {
 
     @DynamicPropertySource
     static void registerPgProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
+        registry.add("spring.datasource.url", POSTGRES::getJdbcUrl);
+        registry.add("spring.datasource.username", POSTGRES::getUsername);
+        registry.add("spring.datasource.password", POSTGRES::getPassword);
     }
 
     @BeforeAll
@@ -83,7 +83,7 @@ class StatusControllerTest {
     @Test
     void shouldCreateStatusSuccessfully() {
         // create status
-        String statusName = faker.animal().name() + faker.number().digits(3);
+        String statusName = FAKER.animal().name() + FAKER.number().digits(3);
         StatusDto newStatus = testHelper.createNewStatus(statusName, requestWithJWTToken, apiStatusUrl);
 
         assertThat(newStatus)
@@ -98,7 +98,7 @@ class StatusControllerTest {
     void shouldReturnStatusDetailsWhenValidLabelIdProvided() {
         // create status
         StatusDto newStatus = testHelper.createNewStatus(
-                faker.animal().name() + faker.number().digits(3),
+                FAKER.animal().name() + FAKER.number().digits(3),
                 requestWithJWTToken,
                 apiStatusUrl);
 
@@ -131,7 +131,7 @@ class StatusControllerTest {
         List<StatusDto> statusForCreateList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             StatusDto newStatus = testHelper.createNewStatus(
-                    faker.animal().name() + faker.number().digits(3),
+                    FAKER.animal().name() + FAKER.number().digits(3),
                     requestWithJWTToken,
                     apiStatusUrl);
             assertThat(newStatus).isNotNull();
@@ -181,7 +181,7 @@ class StatusControllerTest {
     void shouldUpdateStatusDetailsSuccessfully() throws JsonProcessingException {
         // create status
         StatusDto newStatus = testHelper.createNewStatus(
-                faker.animal().name() + faker.number().digits(3),
+                FAKER.animal().name() + FAKER.number().digits(3),
                 requestWithJWTToken,
                 apiStatusUrl);
 
@@ -206,7 +206,7 @@ class StatusControllerTest {
         });
 
         // update status
-        StatusOperationDto statusForUpdate = new StatusOperationDto(faker.color().name());
+        StatusOperationDto statusForUpdate = new StatusOperationDto(FAKER.color().name());
         String userJson = OBJECT_MAPPER.writeValueAsString(statusForUpdate);
         HttpEntity<String> requestWithBodyAndToken = new HttpEntity<>(userJson, requestWithJWTToken.getHeaders());
 
@@ -224,7 +224,7 @@ class StatusControllerTest {
     void shouldDeleteStatusSuccessfullyAndReturnNotFoundAfterDeletion() {
         // create status
         StatusDto newStatus = testHelper.createNewStatus(
-                faker.animal().name() + faker.number().digits(3),
+                FAKER.animal().name() + FAKER.number().digits(3),
                 requestWithJWTToken,
                 apiStatusUrl);
 
@@ -257,7 +257,7 @@ class StatusControllerTest {
     @Test
     void shouldThrowDuplicateStatusExceptionWhenLabelNameAlreadyExists() throws JsonProcessingException {
         // create status
-        String statusName = faker.animal().name() + faker.number().digits(3);
+        String statusName = FAKER.animal().name() + FAKER.number().digits(3);
         testHelper.createNewStatus(statusName, requestWithJWTToken, apiStatusUrl);
 
         // create another status with the same name

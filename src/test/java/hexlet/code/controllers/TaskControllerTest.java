@@ -46,12 +46,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class TaskControllerTest {
 
     public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    private static final Faker faker = new Faker();
-    private static final PostgreSQLContainer<?> postgres
+    private static final Faker FAKER = new Faker();
+    private static final PostgreSQLContainer<?> POSTGRES
             = new PostgreSQLContainer<>(DockerImageName.parse("postgres:latest"));
 
     static {
-        postgres.start();
+        POSTGRES.start();
     }
 
     HttpEntity<String> requestWithJWTToken;
@@ -72,9 +72,9 @@ class TaskControllerTest {
 
     @DynamicPropertySource
     static void registerPgProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
+        registry.add("spring.datasource.url", POSTGRES::getJdbcUrl);
+        registry.add("spring.datasource.username", POSTGRES::getUsername);
+        registry.add("spring.datasource.password", POSTGRES::getPassword);
     }
 
     @BeforeAll
@@ -93,16 +93,16 @@ class TaskControllerTest {
 
         // create executor
         UserDto newUser = testHelper.registerUser(
-                faker.name().firstName(),
-                faker.name().lastName(),
-                faker.internet().emailAddress(),
-                faker.internet().password(),
+                FAKER.name().firstName(),
+                FAKER.name().lastName(),
+                FAKER.internet().emailAddress(),
+                FAKER.internet().password(),
                 apiUserUrl);
         executorId = newUser.getId();
 
         // create status
         StatusDto newStatus = testHelper.createNewStatus(
-                faker.animal().name() + faker.number().digits(3),
+                FAKER.animal().name() + FAKER.number().digits(3),
                 requestWithJWTToken,
                 apiStatusUrl);
         statusId = newStatus.getId();
@@ -114,8 +114,8 @@ class TaskControllerTest {
     @Test
     void shouldCreateTaskSuccessfully() {
         // create task
-        String taskName = faker.pokemon().name() + faker.number().digits(3);
-        String taskDescription = faker.backToTheFuture().quote() + faker.number().digits(3);
+        String taskName = FAKER.pokemon().name() + FAKER.number().digits(3);
+        String taskDescription = FAKER.backToTheFuture().quote() + FAKER.number().digits(3);
         TaskDto newTask = testHelper.createNewTask(
                 taskName,
                 taskDescription,
@@ -143,8 +143,8 @@ class TaskControllerTest {
     void shouldReturnTaskDetailsWhenValidLabelIdProvided() {
         // create task
         TaskDto newTask = testHelper.createNewTask(
-                faker.pokemon().name() + faker.number().digits(3),
-                faker.backToTheFuture().quote() + faker.number().digits(3),
+                FAKER.pokemon().name() + FAKER.number().digits(3),
+                FAKER.backToTheFuture().quote() + FAKER.number().digits(3),
                 statusId,
                 executorId,
                 labelIdSet,
@@ -186,8 +186,8 @@ class TaskControllerTest {
         List<TaskDto> taskForCreateList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             TaskDto newTask = testHelper.createNewTask(
-                    faker.pokemon().name() + faker.number().digits(3),
-                    faker.backToTheFuture().quote() + faker.number().digits(3),
+                    FAKER.pokemon().name() + FAKER.number().digits(3),
+                    FAKER.backToTheFuture().quote() + FAKER.number().digits(3),
                     statusId,
                     executorId,
                     labelIdSet,
@@ -244,8 +244,8 @@ class TaskControllerTest {
     void shouldUpdateTaskDetailsSuccessfully() throws JsonProcessingException {
         // create task
         TaskDto newTask = testHelper.createNewTask(
-                faker.pokemon().name() + faker.number().digits(3),
-                faker.backToTheFuture().quote() + faker.number().digits(3),
+                FAKER.pokemon().name() + FAKER.number().digits(3),
+                FAKER.backToTheFuture().quote() + FAKER.number().digits(3),
                 statusId,
                 executorId,
                 labelIdSet,
@@ -283,16 +283,16 @@ class TaskControllerTest {
         // update task
         // - create new executor
         UserDto newUser = testHelper.registerUser(
-                faker.name().firstName(),
-                faker.name().lastName(),
-                faker.internet().emailAddress(),
-                faker.internet().password(),
+                FAKER.name().firstName(),
+                FAKER.name().lastName(),
+                FAKER.internet().emailAddress(),
+                FAKER.internet().password(),
                 apiUserUrl);
         Long newExecutorId = newUser.getId();
 
         // - create new status
         StatusDto newStatus = testHelper.createNewStatus(
-                faker.animal().name() + faker.number().digits(3),
+                FAKER.animal().name() + FAKER.number().digits(3),
                 requestWithJWTToken,
                 apiStatusUrl);
         Long newStatusId = newStatus.getId();
@@ -301,8 +301,8 @@ class TaskControllerTest {
         Set<Long> newLabelIdSet = testHelper.createLabelIdSet(5, requestWithJWTToken, apiLabelUrl);
 
         TaskOperationDto taskForUpdate = new TaskOperationDto(
-                faker.pokemon().name() + faker.number().digits(3),
-                faker.backToTheFuture().quote() + faker.number().digits(3),
+                FAKER.pokemon().name() + FAKER.number().digits(3),
+                FAKER.backToTheFuture().quote() + FAKER.number().digits(3),
                 newStatusId,
                 null,
                 newExecutorId,
@@ -331,8 +331,8 @@ class TaskControllerTest {
     void shouldDeleteStatusSuccessfullyAndReturnNotFoundAfterDeletion() {
         // create task
         TaskDto newTask = testHelper.createNewTask(
-                faker.pokemon().name() + faker.number().digits(3),
-                faker.backToTheFuture().quote() + faker.number().digits(3),
+                FAKER.pokemon().name() + FAKER.number().digits(3),
+                FAKER.backToTheFuture().quote() + FAKER.number().digits(3),
                 statusId,
                 executorId,
                 labelIdSet,
@@ -378,8 +378,8 @@ class TaskControllerTest {
     @Test
     void shouldThrowDuplicateTaskExceptionWhenTaskWithSameNameAlreadyExists() throws JsonProcessingException {
         // create task
-        String taskName = faker.pokemon().name() + faker.number().digits(3);
-        String taskDescription = faker.backToTheFuture().quote() + faker.number().digits(3);
+        String taskName = FAKER.pokemon().name() + FAKER.number().digits(3);
+        String taskDescription = FAKER.backToTheFuture().quote() + FAKER.number().digits(3);
         testHelper.createNewTask(
                 taskName,
                 taskDescription,
@@ -392,7 +392,7 @@ class TaskControllerTest {
         // create task with the same name
         TaskOperationDto taskWithSameName = new TaskOperationDto(
                 taskName,
-                faker.backToTheFuture().quote() + faker.number().digits(3),
+                FAKER.backToTheFuture().quote() + FAKER.number().digits(3),
                 statusId,
                 null,
                 executorId,
@@ -410,15 +410,15 @@ class TaskControllerTest {
     @Test
     void shouldThrowLabelAssociatedWithTaskExceptionWhenLabelIsAssociatedWithTask() {
         // create label
-        String labelName = faker.color().name() + faker.number().digits(3);
+        String labelName = FAKER.color().name() + FAKER.number().digits(3);
         LabelDto newLabel = testHelper.createNewLabel(labelName, requestWithJWTToken, apiLabelUrl);
 
         // create task associated with the label
         Set<Long> labelIds = new HashSet<>();
         labelIds.add(newLabel.getId());
         testHelper.createNewTask(
-                faker.pokemon().name() + faker.number().digits(3),
-                faker.backToTheFuture().quote() + faker.number().digits(3),
+                FAKER.pokemon().name() + FAKER.number().digits(3),
+                FAKER.backToTheFuture().quote() + FAKER.number().digits(3),
                 statusId,
                 executorId,
                 labelIds,
@@ -440,13 +440,13 @@ class TaskControllerTest {
     @Test
     void shouldThrowStatusAssociatedWithTaskExceptionWhenStatusIsAssociatedWithTask() {
         // create status
-        String statusName = faker.animal().name() + faker.number().digits(3);
+        String statusName = FAKER.animal().name() + FAKER.number().digits(3);
         StatusDto newStatus = testHelper.createNewStatus(statusName, requestWithJWTToken, apiStatusUrl);
 
         // create task associated with the status
         testHelper.createNewTask(
-                faker.pokemon().name() + faker.number().digits(3),
-                faker.backToTheFuture().quote() + faker.number().digits(3),
+                FAKER.pokemon().name() + FAKER.number().digits(3),
+                FAKER.backToTheFuture().quote() + FAKER.number().digits(3),
                 newStatus.getId(),
                 executorId,
                 labelIdSet,
@@ -468,11 +468,11 @@ class TaskControllerTest {
     @Test
     void shouldThrowUserAssociatedWithTaskExceptionWhenUserIsAssociatedWithTask() {
         // user registration
-        String password = faker.internet().password();
+        String password = FAKER.internet().password();
         UserDto registerUser = testHelper.registerUser(
-                faker.name().firstName(),
-                faker.name().lastName(),
-                faker.internet().emailAddress(),
+                FAKER.name().firstName(),
+                FAKER.name().lastName(),
+                FAKER.internet().emailAddress(),
                 password,
                 apiUserUrl);
 
@@ -484,8 +484,8 @@ class TaskControllerTest {
 
         // create task associated with user
         testHelper.createNewTask(
-                faker.pokemon().name() + faker.number().digits(3),
-                faker.backToTheFuture().quote() + faker.number().digits(3),
+                FAKER.pokemon().name() + FAKER.number().digits(3),
+                FAKER.backToTheFuture().quote() + FAKER.number().digits(3),
                 statusId,
                 executorId,
                 labelIdSet,
@@ -509,17 +509,17 @@ class TaskControllerTest {
         // Create tasks with different parameters
         Set<Long> anotherLabelIdSet = testHelper.createLabelIdSet(2, requestWithJWTToken, apiLabelUrl);
         Long anotherExecutorId = testHelper.registerUser(
-                faker.name().firstName(),
-                faker.name().lastName(),
-                faker.internet().emailAddress(),
-                faker.internet().password(),
+                FAKER.name().firstName(),
+                FAKER.name().lastName(),
+                FAKER.internet().emailAddress(),
+                FAKER.internet().password(),
                 apiUserUrl).getId();
 
         // Create 5 tasks with original parameters
         for (int i = 0; i < 5; i++) {
             testHelper.createNewTask(
-                    faker.pokemon().name() + faker.number().digits(3),
-                    faker.backToTheFuture().quote() + faker.number().digits(3),
+                    FAKER.pokemon().name() + FAKER.number().digits(3),
+                    FAKER.backToTheFuture().quote() + FAKER.number().digits(3),
                     statusId,
                     executorId,
                     labelIdSet,
@@ -530,8 +530,8 @@ class TaskControllerTest {
         // Create 5 tasks with different executor and label
         for (int i = 0; i < 5; i++) {
             testHelper.createNewTask(
-                    faker.pokemon().name() + faker.number().digits(3),
-                    faker.backToTheFuture().quote() + faker.number().digits(3),
+                    FAKER.pokemon().name() + FAKER.number().digits(3),
+                    FAKER.backToTheFuture().quote() + FAKER.number().digits(3),
                     statusId,
                     anotherExecutorId,
                     anotherLabelIdSet,

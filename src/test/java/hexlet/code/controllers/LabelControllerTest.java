@@ -39,13 +39,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 class LabelControllerTest {
 
     public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    private static final Faker faker = new Faker();
+    private static final Faker FAKER = new Faker();
 
-    private static final PostgreSQLContainer<?> postgres
+    private static final PostgreSQLContainer<?> POSTGRES
             = new PostgreSQLContainer<>(DockerImageName.parse("postgres:latest"));
 
     static {
-        postgres.start();
+        POSTGRES.start();
     }
 
     HttpEntity<String> requestWithJWTToken;
@@ -61,9 +61,9 @@ class LabelControllerTest {
 
     @DynamicPropertySource
     static void registerPgProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
+        registry.add("spring.datasource.url", POSTGRES::getJdbcUrl);
+        registry.add("spring.datasource.username", POSTGRES::getUsername);
+        registry.add("spring.datasource.password", POSTGRES::getPassword);
     }
 
     @BeforeAll
@@ -82,7 +82,7 @@ class LabelControllerTest {
     @Test
     void shouldCreateLabelSuccessfully() {
         // create label
-        String labelName = faker.color().name() + faker.number().digits(3);
+        String labelName = FAKER.color().name() + FAKER.number().digits(3);
         LabelDto newLabel = testHelper.createNewLabel(labelName, requestWithJWTToken, apiLabelUrl);
 
         assertThat(newLabel)
@@ -97,7 +97,7 @@ class LabelControllerTest {
     void shouldReturnLabelDetailsWhenValidLabelIdProvided() {
         // create label
         LabelDto newLabel = testHelper.createNewLabel(
-                faker.color().name() + faker.number().digits(3),
+                FAKER.color().name() + FAKER.number().digits(3),
                 requestWithJWTToken,
                 apiLabelUrl);
 
@@ -130,7 +130,7 @@ class LabelControllerTest {
         List<LabelDto> labelForCreateList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             LabelDto newLabel = testHelper.createNewLabel(
-                    faker.color().name() + faker.number().digits(3),
+                    FAKER.color().name() + FAKER.number().digits(3),
                     requestWithJWTToken,
                     apiLabelUrl);
             assertThat(newLabel).isNotNull();
@@ -180,7 +180,7 @@ class LabelControllerTest {
     void shouldUpdateLabelDetailsSuccessfully() throws JsonProcessingException {
         // create label
         LabelDto newLabel = testHelper.createNewLabel(
-                faker.color().name() + faker.number().digits(3),
+                FAKER.color().name() + FAKER.number().digits(3),
                 requestWithJWTToken,
                 apiLabelUrl);
 
@@ -207,7 +207,7 @@ class LabelControllerTest {
                 });
 
         // update label
-        LabelOperationDto labelForUpdate = new LabelOperationDto(faker.color().name());
+        LabelOperationDto labelForUpdate = new LabelOperationDto(FAKER.color().name());
         String userJson = OBJECT_MAPPER.writeValueAsString(labelForUpdate);
         HttpEntity<String> requestWithBodyAndToken = new HttpEntity<>(userJson, requestWithJWTToken.getHeaders());
 
@@ -227,7 +227,7 @@ class LabelControllerTest {
     void shouldDeleteLabelSuccessfullyAndReturnNotFoundAfterDeletion() {
         // create label
         LabelDto newLabel = testHelper.createNewLabel(
-                faker.color().name() + faker.number().digits(3),
+                FAKER.color().name() + FAKER.number().digits(3),
                 requestWithJWTToken,
                 apiLabelUrl);
 
@@ -262,7 +262,7 @@ class LabelControllerTest {
     @Test
     void shouldThrowDuplicateLabelExceptionWhenLabelNameAlreadyExists() throws JsonProcessingException {
         // create label
-        String labelName = faker.color().name() + faker.number().digits(3);
+        String labelName = FAKER.color().name() + FAKER.number().digits(3);
         testHelper.createNewLabel(labelName, requestWithJWTToken, apiLabelUrl);
 
         // create another label with the same name
