@@ -82,7 +82,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             log.error(message);
             throw new UserNotFoundException(message);
         }
-        if (taskRepository.existsByAuthor_IdOrExecutor_Id(id, id)) {
+        if (taskRepository.existsByAuthorIdOrExecutorId(id, id)) {
             String message = String.format("Status with ID %d is associated with a task, cannot delete.", id);
             log.error(message);
             throw new UserAssociatedWithTaskException(message);

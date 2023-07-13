@@ -74,7 +74,7 @@ public class LabelServiceImpl implements LabelService {
             log.error(message);
             throw new LabelNotFoundException(message);
         }
-        if (taskRepository.existsByLabels_Id(id)) {
+        if (taskRepository.existsByLabelsId(id)) {
             String message = String.format("Label with ID %d is associated with a task, cannot delete.", id);
             log.error(message);
             throw new LabelAssociatedWithTaskException(message);

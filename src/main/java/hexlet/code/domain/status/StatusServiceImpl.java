@@ -74,7 +74,7 @@ public class StatusServiceImpl implements StatusService {
             log.error(message);
             throw new StatusNotFoundException(message);
         }
-        if (taskRepository.existsByTaskStatus_Id(id)) {
+        if (taskRepository.existsByTaskStatusId(id)) {
             String message = String.format("Status with ID %d is associated with a task, cannot delete.", id);
             log.error(message);
             throw new StatusAssociatedWithTaskException(message);

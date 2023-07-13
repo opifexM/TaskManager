@@ -10,9 +10,9 @@ import java.util.Optional;
 public interface TaskRepository extends JpaRepository<Task, Long>, JpaSpecificationExecutor<Task> {
     Optional<Task> findByName(String name);
 
-    boolean existsByLabels_Id(Long id);
+    boolean existsByLabelsId(Long id);
 
-    boolean existsByTaskStatus_Id(Long id);
+    boolean existsByTaskStatusId(Long id);
 
-    boolean existsByAuthor_IdOrExecutor_Id(Long id1, Long id2);
+    boolean existsByAuthorIdOrExecutorId(Long id1, Long id2);
 }
