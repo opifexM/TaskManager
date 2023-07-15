@@ -10,7 +10,7 @@ plugins {
 
 group = 'hexlet.code'
 version = '1.0-SNAPSHOT'
-sourceCompatibility = '17'
+sourceCompatibility = '20'
 
 configurations {
     compileOnly {
