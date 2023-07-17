@@ -6,7 +6,6 @@
 
 # Task Manager
 
-Web Site: https://taskm.herokuapp.com/  
 Swagger: https://taskm.herokuapp.com/swagger-ui/index.html
 
 ## Overview
